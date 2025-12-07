@@ -35,7 +35,7 @@ void register_keywords() {
     keywords["end"] = TokenType::End;
     keywords["true"] = TokenType::True;
     keywords["false"] = TokenType::False;
-    keywords["null"] = TokenType::Null;
+    keywords["Nil"] = TokenType::Nil;
 
     keywords_registered = true;
 }
