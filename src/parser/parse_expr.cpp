@@ -173,14 +173,14 @@ std::unique_ptr<Expression> Parser::parse_primary() {
     if (tok.type == TokenType::String) {
         return std::make_unique<StringExpr>(tok.text);
     }
-    if (tok.type == TokenType::Null) {
-        return std::make_unique<StringExpr>(tok.text);
+    if (tok.type == TokenType::Nil) {
+        return std::make_unique<NilExpr>();
     }
     if (tok.type == TokenType::True) {
-        return std::make_unique<StringExpr>(tok.text);
+        return std::make_unique<BoolExpr>(true);
     }
     if (tok.type == TokenType::False) {
-        return std::make_unique<StringExpr>(tok.text);
+        return std::make_unique<BoolExpr>(false);
     }
     if (tok.type == TokenType::Identifier) {
         return std::make_unique<IdentifierExpr>(tok.text);
