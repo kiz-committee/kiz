@@ -93,7 +93,7 @@ void IRGenerator::gen_expr(Expression* expr) {
             }
             // 生成 OP_MAKE_LIST 指令
             curr_code_list.emplace_back(
-                Opcode::MAKE_LIST,
+            Opcode::MAKE_LIST,
                 std::vector{list_expr->elements.size()},
                 expr->start_ln,
                 expr->end_ln
@@ -106,7 +106,7 @@ void IRGenerator::gen_expr(Expression* expr) {
             gen_expr(get_mem->father.get()); // 生成对象IR
             size_t name_idx = get_or_add_name(curr_names, get_mem->child->name);
             curr_code_list.emplace_back(
-                Opcode::GET_ATTR,
+            Opcode::GET_ATTR,
                 std::vector<size_t>{name_idx},
                 expr->start_ln,
                 expr->end_ln
@@ -121,7 +121,7 @@ void IRGenerator::gen_expr(Expression* expr) {
             const auto* get_mem = dynamic_cast<GetMemberExpr*>(set_mem->g_mem.get());
             size_t name_idx = get_or_add_name(curr_names, get_mem->child->name);
             curr_code_list.emplace_back(
-                Opcode::SET_ATTR,
+            Opcode::SET_ATTR,
                 std::vector<size_t>{name_idx},
                 expr->start_ln,
                 expr->end_ln
@@ -153,14 +153,14 @@ void IRGenerator::gen_expr(Expression* expr) {
                 const size_t nil_idx = get_or_add_const(curr_consts, nil);
                 curr_code_list.emplace_back(
                 Opcode::LOAD_CONST,
-                std::vector<size_t>{nil_idx},
-                lambda->body->start_ln,
-                lambda->body->end_ln
+                    std::vector<size_t>{nil_idx},
+                    lambda->body->start_ln,
+                    lambda->body->end_ln
                 );
                 curr_code_list.emplace_back(
                 Opcode::RET,
-                std::vector<size_t>{},
-                lambda->body->end_ln,
+                    std::vector<size_t>{},
+                    lambda->body->end_ln,
                     lambda->body->end_ln
                 );
             }
@@ -189,6 +189,30 @@ void IRGenerator::gen_expr(Expression* expr) {
             curr_code_list.emplace_back(
                 Opcode::LOAD_CONST,
                 std::vector{fn_const_idx},
+                expr->start_ln,
+                expr->end_ln
+            );
+            break;
+        }
+        case NilExpr : {
+            const auto nil = new model::Nil();
+            const size_t nil_idx = get_or_add_const(curr_consts, nil);
+            curr_code_list.emplace_back(
+            Opcode::LOAD_CONST,
+                std::vector<size_t>{nil_idx},
+                expr->start_ln,
+                expr->end_ln
+            );
+            break;
+        }
+        case BoolExpr : {
+            const auto bool_ast = dynamic_cast<BoolExpr*>(expr);
+            assert(bool_ast!=nullptr);
+            const auto bool_obj = new model::Bool(bool_ast->val);
+            const size_t bool_idx = get_or_add_const(curr_consts, bool_obj);
+            curr_code_list.emplace_back(
+            Opcode::LOAD_CONST,
+                std::vector<size_t>{bool_idx},
                 expr->start_ln,
                 expr->end_ln
             );
