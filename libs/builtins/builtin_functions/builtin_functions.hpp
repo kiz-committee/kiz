@@ -115,6 +115,10 @@ inline auto copy = [](model::Object* self, const model::List* args) -> model::Ob
 
 };
 
+inline auto create = [](model::Object* self, const model::List* args) -> model::Object* {
+
+};
+
 inline auto typeof = [](model::Object* self, const model::List* args) -> model::Object* {
 
 };
