@@ -16,14 +16,8 @@
 
 #include "kiz.hpp"
 
-#include "models.hpp"
-#include "bool_obj.hpp"
-#include "nil_obj.hpp"
-#include "int_obj.hpp"
-#include "rational_obj.hpp"
-#include "str_obj.hpp"
-#include "list_obj.hpp"
-#include "dict_obj.hpp"
+#include "../libs/builtins/include/builtin_methods.hpp"
+#include "../libs/builtins/include/builtin_functions.hpp"
 
 namespace kiz {
 
@@ -33,11 +27,13 @@ model::Module* Vm::main_module;
 std::stack<model::Object*> Vm::op_stack_{};
 std::vector<std::unique_ptr<CallFrame>> Vm::call_stack_{};
 bool Vm::running_ = false;
-const std::string& Vm::file_path = "";
+std::string Vm::file_path;
 
-Vm::Vm(const std::string& file_path) : file_path(file_path) {
+Vm::Vm(const std::string& file_path_) {
+    file_path = file_path_;
     DEBUG_OUTPUT("registering builtin functions...");
-#define KIZ_FUNC(n) builtins.insert(#n, new model::CppFunction(builtin_objects::n))
+    builtin::register_builtin_functions();
+#define KIZ_FUNC(n) builtins.insert(#n, new model::CppFunction(builtin::n))
     KIZ_FUNC(print);
     KIZ_FUNC(input);
     KIZ_FUNC(isinstance);
@@ -56,54 +52,56 @@ Vm::Vm(const std::string& file_path) : file_path(file_path) {
     model::based_str->attrs.insert("__parent__", model::based_obj);
 
     DEBUG_OUTPUT("registering magic methods...");
-    // Object 基类 __eq__
-    based_obj->attrs.insert("__eq__", new CppFunction([](const Object* self, const List* args) -> Object* {
-        const auto other_obj = get_one_arg(args);
-        return new Bool(self == other_obj);
+
+        // Object 基类 __eq__
+    model::based_obj->attrs.insert("__eq__", new model::CppFunction([](const model::Object* self, const model::List* args) -> model::Object* {
+        const auto other_obj = builtin::get_one_arg(args);
+        return new model::Bool(self == other_obj);
     }));
 
     // Bool 类型魔法方法
-    based_bool->attrs.insert("__eq__", new CppFunction(bool_eq));
+    model::based_bool->attrs.insert("__eq__", new model::CppFunction(model::bool_eq));
 
     // Nil 类型魔法方法
-    based_nil->attrs.insert("__eq__", new CppFunction(nil_eq));
+    model::based_nil->attrs.insert("__eq__", new model::CppFunction(model::nil_eq));
 
     // Int 类型魔法方法
-    based_int->attrs.insert("__add__", new CppFunction(int_add));
-    based_int->attrs.insert("__sub__", new CppFunction(int_sub));
-    based_int->attrs.insert("__mul__", new CppFunction(int_mul));
-    based_int->attrs.insert("__div__", new CppFunction(int_div));
-    based_int->attrs.insert("__mod__", new CppFunction(int_mod));
-    based_int->attrs.insert("__pow__", new CppFunction(int_pow));
-    based_int->attrs.insert("__gt__", new CppFunction(int_gt));
-    based_int->attrs.insert("__lt__", new CppFunction(int_lt));
-    based_int->attrs.insert("__eq__", new CppFunction(int_eq));
+    model::based_int->attrs.insert("__add__", new model::CppFunction(model::int_add));
+    model::based_int->attrs.insert("__sub__", new model::CppFunction(model::int_sub));
+    model::based_int->attrs.insert("__mul__", new model::CppFunction(model::int_mul));
+    model::based_int->attrs.insert("__div__", new model::CppFunction(model::int_div));
+    model::based_int->attrs.insert("__mod__", new model::CppFunction(model::int_mod));
+    model::based_int->attrs.insert("__pow__", new model::CppFunction(model::int_pow));
+    model::based_int->attrs.insert("__gt__", new model::CppFunction(model::int_gt));
+    model::based_int->attrs.insert("__lt__", new model::CppFunction(model::int_lt));
+    model::based_int->attrs.insert("__eq__", new model::CppFunction(model::int_eq));
 
     // Rational 类型魔法方法
-    based_rational->attrs.insert("__add__", new CppFunction(rational_add));
-    based_rational->attrs.insert("__sub__", new CppFunction(rational_sub));
-    based_rational->attrs.insert("__mul__", new CppFunction(rational_mul));
-    based_rational->attrs.insert("__div__", new CppFunction(rational_div));
-    based_rational->attrs.insert("__gt__", new CppFunction(rational_gt));
-    based_rational->attrs.insert("__lt__", new CppFunction(rational_lt));
-    based_rational->attrs.insert("__eq__", new CppFunction(rational_eq));
+    model::based_rational->attrs.insert("__add__", new model::CppFunction(model::rational_add));
+    model::based_rational->attrs.insert("__sub__", new model::CppFunction(model::rational_sub));
+    model::based_rational->attrs.insert("__mul__", new model::CppFunction(model::rational_mul));
+    model::based_rational->attrs.insert("__div__", new model::CppFunction(model::rational_div));
+    model::based_rational->attrs.insert("__gt__", new model::CppFunction(model::rational_gt));
+    model::based_rational->attrs.insert("__lt__", new model::CppFunction(model::rational_lt));
+    model::based_rational->attrs.insert("__eq__", new model::CppFunction(model::rational_eq));
 
     // Dictionary 类型魔法方法
-    based_dict->attrs.insert("__add__", new CppFunction(dict_add));
-    based_dict->attrs.insert("__contains__", new CppFunction(dict_contains));
+    model::based_dict->attrs.insert("__add__", new model::CppFunction(model::dict_add));
+    model::based_dict->attrs.insert("__contains__", new model::CppFunction(model::dict_contains));
 
     // List 类型魔法方法
-    based_list->attrs.insert("__add__", new CppFunction(list_add));
-    based_list->attrs.insert("__mul__", new CppFunction(list_mul));
-    based_list->attrs.insert("__contains__", new CppFunction(list_contains));
-    based_list->attrs.insert("__eq__", new CppFunction(list_eq));
-    based_list->attrs.insert("append", new CppFunction(list_append));
+    model::based_list->attrs.insert("__add__", new model::CppFunction(model::list_add));
+    model::based_list->attrs.insert("__mul__", new model::CppFunction(model::list_mul));
+    model::based_list->attrs.insert("__contains__", new model::CppFunction(model::list_contains));
+    model::based_list->attrs.insert("__eq__", new model::CppFunction(model::list_eq));
+    model::based_list->attrs.insert("append", new model::CppFunction(model::list_append));
 
     // String 类型魔法方法
-    based_str->attrs.insert("__add__", new CppFunction(str_add));
-    based_str->attrs.insert("__mul__", new CppFunction(str_mul));
-    based_str->attrs.insert("__contains__", new CppFunction(str_contains));
-    based_str->attrs.insert("__eq__", new CppFunction(str_eq));
+    model::based_str->attrs.insert("__add__", new model::CppFunction(model::str_add));
+    model::based_str->attrs.insert("__mul__", new model::CppFunction(model::str_mul));
+    model::based_str->attrs.insert("__contains__", new model::CppFunction(model::str_contains));
+    model::based_str->attrs.insert("__eq__", new model::CppFunction(model::str_eq));
+
 
     builtins.insert("int", model::based_int);
     builtins.insert("bool", model::based_bool);
@@ -113,16 +111,6 @@ Vm::Vm(const std::string& file_path) : file_path(file_path) {
     builtins.insert("str", model::based_str);
     builtins.insert("function", model::based_function);
     builtins.insert("nil", model::based_nil);
-}
-
-~Vm() {
-    Vm::builtins{};
-    Vm::loaded_modules{};
-    Vm::main_module = nullptr;
-    Vm::op_stack_{};
-    Vm::call_stack_{};
-    Vm::running_ = false;
-    Vm::file_path = "";
 }
 
 void Vm::load(model::Module* src_module) {
@@ -141,19 +129,19 @@ void Vm::load(model::Module* src_module) {
     module_call_frame->is_week_scope = false;          // 模块作用域为"强作用域"（非弱作用域）
     module_call_frame->locals = deps::HashMap<model::Object*>(); // 初始空局部变量表
     module_call_frame->pc = 0;                         // 程序计数器初始化为0（从第一条指令开始执行）
-    module_call_frame->return_to_pc = this->code_list_.size(); // 执行完所有指令后返回的位置（指令池末尾）
+    module_call_frame->return_to_pc = module_call_frame->code_object->code.size(); // 执行完所有指令后返回的位置（指令池末尾）
     module_call_frame->name = src_module->name;        // 调用帧名称与模块名一致（便于调试）
     module_call_frame->code_object = src_module->code; // 关联当前模块的CodeObject
     module_call_frame->curr_lineno_map = src_module->code->lineno_map; // 复制行号映射（用于错误定位）
     module_call_frame->names = src_module->code->names; // 复制变量名列表（指令操作数索引对应此列表）
 
     // 将调用帧压入VM的调用栈
-    this->call_stack_.emplace_back(std::move(module_call_frame));
+    call_stack_.emplace_back(std::move(module_call_frame));
 
     // 初始化VM执行状态：标记为"就绪"
-    this->running_ = true; // 标记VM为运行状态（等待exec触发执行）
-    assert(!this->call_stack_.empty() && "Vm::load: 调用栈为空，无法执行指令");
-    auto& module_frame = *this->call_stack_.back(); // 获取当前模块的调用帧（栈顶）
+    running_ = true; // 标记VM为运行状态（等待exec触发执行）
+    assert(!call_stack_.empty() && "Vm::load: 调用栈为空，无法执行指令");
+    auto& module_frame = *call_stack_.back(); // 获取当前模块的调用帧（栈顶）
     assert(module_frame.code_object != nullptr && "Vm::load: 当前调用帧无关联CodeObject");
 
     // 循环执行当前调用帧下的所有指令
@@ -172,7 +160,7 @@ void Vm::load(model::Module* src_module) {
 
         // 执行当前指令
         const Instruction& curr_inst = curr_frame.code_object->code[curr_frame.pc];
-        this->exec(curr_inst);
+        exec(curr_inst);
         DEBUG_OUTPUT("curr inst is "+opcode_to_string(curr_inst.opc));
 
         // 调试输出栈顶
@@ -249,7 +237,7 @@ void Vm::extend_code(const model::CodeObject* code_object) {
     curr_frame.pc = prev_instr_count; // 从原有指令末尾开始执行新指令
     while (curr_frame.pc < global_code_obj.code.size()) {
         const Instruction& curr_inst = global_code_obj.code[curr_frame.pc];
-        this->exec(curr_inst);
+        exec(curr_inst);
         curr_frame.pc++;
     }
     DEBUG_OUTPUT("extend_code: 执行新指令完成（PC 从 "
@@ -267,7 +255,7 @@ void Vm::extend_code(const model::CodeObject* code_object) {
     }
 }
 
-void Vm::load_required_modules(deps::HashMap<model::Object*> modules) {
+void Vm::load_required_modules(const deps::HashMap<model::Module*>& modules) {
     loaded_modules = modules;
 }
 

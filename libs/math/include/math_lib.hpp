@@ -1,20 +1,19 @@
 #pragma once
-#include "model.hpp"
-#include "../../deps/rational.hpp"
+#include "models.hpp"
 
 namespace math_lib {
 
-inline auto pi = new model::Rational(deps::Rational(3.14159));
+inline auto one = new model::Int(deps::BigInt(1));
 
-inline auto __init_module__ = [](model::Object* self, const model::List* args) -> model::Object* {
+inline auto _init_module_ = [](model::Object* self, const model::List* args) -> model::Object* {
     auto mod = new model::Module(
         "math",
         nullptr
     );
 
-    mod->attrs.insert("pi", pi);
+    mod->attrs.insert("one", one);
     
     return mod;
-}
+};
 
 }

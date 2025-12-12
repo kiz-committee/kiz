@@ -1,4 +1,7 @@
 
+#include <cassert>
+
+#include "models.hpp"
 #include "vm.hpp"
 
 namespace kiz {
@@ -54,7 +57,8 @@ void Vm::exec_JUMP(const Instruction& instruction) {
         assert(false && "JUMP: 无目标pc索引");
     }
     size_t target_pc = instruction.opn_list[0];
-    if (target_pc > code_list_.size()) {
+    CallFrame* curr_frame = call_stack_.back().get();
+    if (target_pc > curr_frame->code_object->code.size()) {
         assert(false && "JUMP: 目标pc超出字节码范围");
     }
     call_stack_.back()->pc = target_pc;
@@ -85,7 +89,8 @@ void Vm::exec_JUMP_IF_FALSE(const Instruction& instruction) {
 
     if (need_jump) {
         // 跳转逻辑
-        if (target_pc > code_list_.size()) {
+        CallFrame* curr_frame = call_stack_.back().get();
+        if (target_pc > curr_frame->code_object->code.size()) {
             cond->del_ref();
             assert(false && "JUMP_IF_FALSE: 目标pc超出范围");
         }

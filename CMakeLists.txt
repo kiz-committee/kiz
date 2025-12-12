@@ -21,24 +21,49 @@ configure_file(
         @ONLY
 )
 
-# 收集所有源文件
+# 收集src目录下的所有源文件
 file(GLOB_RECURSE SRC_FILES
         "${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
+
+# ===================== 新增：添加libs/builtins下的源文件 =====================
+# 定义需要加入的builtins源文件列表
+set(BUILTINS_SRC_FILES
+        ${PROJECT_SOURCE_DIR}/libs/builtins/bool_obj.cpp
+        ${PROJECT_SOURCE_DIR}/libs/builtins/int_obj.cpp
+        ${PROJECT_SOURCE_DIR}/libs/builtins/rational_obj.cpp
+        ${PROJECT_SOURCE_DIR}/libs/builtins/nil_obj.cpp
+        ${PROJECT_SOURCE_DIR}/libs/builtins/str_obj.cpp
+        ${PROJECT_SOURCE_DIR}/libs/builtins/list_obj.cpp
+        ${PROJECT_SOURCE_DIR}/libs/builtins/dict_obj.cpp
+        ${PROJECT_SOURCE_DIR}/libs/builtins/builtin_functions.cpp # 注意：原文件名可能是builtin_functions.cpp（少打了一个l），请确认实际文件名
+)
+
+# 检查builtins文件是否存在（避免编译错误）
+foreach(builtin_file ${BUILTINS_SRC_FILES})
+    if(NOT EXISTS ${builtin_file})
+        message(FATAL_ERROR "未找到builtins文件：${builtin_file}，请确认文件路径/名称正确！")
+    endif()
+endforeach()
+
+# 合并所有源文件（src + libs/builtins）
+set(ALL_SRC_FILES ${SRC_FILES} ${BUILTINS_SRC_FILES})
+# ==============================================================================
 
 # 检查main.cpp是否存在
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/main.cpp")
     message(FATAL_ERROR "未找到入口文件：src/main.cpp，请确认文件路径正确！")
 endif()
 
-# 添加可执行目标
-add_executable(kiz ${SRC_FILES})
+# 添加可执行目标（使用合并后的所有源文件）
+add_executable(kiz ${ALL_SRC_FILES})
 
 # 关键修改：添加构建目录的include到搜索路径
 target_include_directories(kiz
         PRIVATE
         "${PROJECT_SOURCE_DIR}/include"       # 源码的include
         "${PROJECT_SOURCE_DIR}/deps"          # deps目录
+        "${PROJECT_SOURCE_DIR}/libs"          # libs目录（包含builtins头文件）
         "${CMAKE_CURRENT_BINARY_DIR}/include" # 构建目录的include（生成的version.hpp在这里）
 )
 
@@ -49,12 +74,18 @@ else()
     set_target_properties(kiz PROPERTIES SUFFIX ".elf")
 endif()
 
+# ===================== 源文件数量统计 =====================
+list(LENGTH ALL_SRC_FILES TOTAL_SRC_COUNT)
+list(LENGTH SRC_FILES SRC_DIR_COUNT)
+list(LENGTH BUILTINS_SRC_FILES BUILTINS_COUNT)
+
 # 修正打印信息
 message(STATUS "=== 项目kiz v${PROJECT_VERSION} 编译配置 ===")
-message(STATUS "源文件数量：${CMAKE_ARGC}")
+message(STATUS "源文件总数：${TOTAL_SRC_COUNT} (src目录：${SRC_DIR_COUNT} | builtins：${BUILTINS_COUNT})")
 message(STATUS "头文件搜索路径：")
 message(STATUS "  - ${PROJECT_SOURCE_DIR}/include")
 message(STATUS "  - ${PROJECT_SOURCE_DIR}/deps")
-message(STATUS "  - ${CMAKE_CURRENT_BINARY_DIR}/include") # 新增：打印构建目录的include路径
+message(STATUS "  - ${PROJECT_SOURCE_DIR}/libs")          # 补充打印libs路径
+message(STATUS "  - ${CMAKE_CURRENT_BINARY_DIR}/include") # 构建目录的include路径
 message(STATUS "目标文件：${CMAKE_BINARY_DIR}/kiz$<TARGET_FILE_SUFFIX:kiz>")
 message(STATUS "======================================")

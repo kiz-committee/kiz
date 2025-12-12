@@ -23,7 +23,7 @@
 #include <exception>
 #include <string>
 
-class KizStopExecSignal : public std::runtime_error {
+class KizStopExecSignal final : public std::runtime_error {
 public:
     KizStopExecSignal() noexcept
         : std::runtime_error("kiz-lang 执行终止信号") {}

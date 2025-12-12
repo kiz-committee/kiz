@@ -13,23 +13,10 @@
 #include <utility>
 
 #include "kiz.hpp" // 不能删 !!!
-#include "opcode.hpp"
+#include "vm.hpp"
 #include "../deps/hashmap.hpp"
 #include "../deps/bigint.hpp"
 #include "../deps/rational.hpp"
-
-namespace kiz {
-
-class Vm;
-
-struct Instruction {
-    Opcode opc;
-    std::vector<size_t> opn_list;
-    size_t start_lineno;
-    size_t end_lineno;
-};
-
-}
 
 namespace model {
 

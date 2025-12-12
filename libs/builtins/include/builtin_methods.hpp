@@ -1,3 +1,8 @@
+#pragma once
+#include <functional>
+
+#include "models.hpp"
+
 namespace model {
 
 using NativeFuncPtr = std::function<Object*(Object*, const List*)>;
@@ -7,6 +12,7 @@ inline NativeFuncPtr int_sub;
 inline NativeFuncPtr int_mul;
 inline NativeFuncPtr int_div;
 inline NativeFuncPtr int_pow;
+inline NativeFuncPtr int_mod;
 inline NativeFuncPtr int_eq;
 inline NativeFuncPtr int_lt;
 inline NativeFuncPtr int_gt;
@@ -34,6 +40,7 @@ inline NativeFuncPtr bool_repr;
 
 inline NativeFuncPtr str_eq;
 inline NativeFuncPtr str_add;
+inline NativeFuncPtr str_mul;
 inline NativeFuncPtr str_contains;
 inline NativeFuncPtr str_str;
 inline NativeFuncPtr str_repr;
@@ -46,7 +53,9 @@ inline NativeFuncPtr dict_repr;
 
 inline NativeFuncPtr list_eq;
 inline NativeFuncPtr list_add;
+inline NativeFuncPtr list_mul;
 inline NativeFuncPtr list_contains;
+inline NativeFuncPtr list_append;
 inline NativeFuncPtr list_str;
 inline NativeFuncPtr list_repr;
 

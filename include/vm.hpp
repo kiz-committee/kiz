@@ -24,6 +24,15 @@ namespace kiz {
 
 enum class Opcode;
 
+
+struct Instruction {
+    Opcode opc;
+    std::vector<size_t> opn_list;
+    size_t start_lineno;
+    size_t end_lineno;
+};
+
+
 struct VmState{
     model::Object* stack_top;
     deps::HashMap<model::Object*> locals;
@@ -46,15 +55,14 @@ class Vm {
     static std::stack<model::Object*> op_stack_;
     static std::vector<std::unique_ptr<CallFrame>> call_stack_;
     static bool running_;
-    static const std::string& file_path;
+    static std::string file_path;
 public:
     static deps::HashMap<model::Object*> builtins;
 
-    explicit Vm(const std::string& file_path);
-    ~Vm();
-
+    explicit Vm(const std::string& file_path_);
     static void load(model::Module* src_module);
     static void extend_code(const model::CodeObject* code_object);
+    static void load_required_modules(const deps::HashMap<model::Module*>& modules);
     static VmState get_vm_state();
     static void exec(const Instruction& instruction);
     static std::tuple<model::Object*, model::Object*> fetch_two_from_stack_top(const std::string& curr_instruction_name);
@@ -62,7 +70,7 @@ public:
     static model::Object* get_attr(const model::Object* obj, const std::string& attr);
     static std::string get_obj_to_str(const model::Object* obj);
     static std::string get_obj_debug_str(const model::Object* obj);
-    static bool check_obj_is_true(const model::Object* obj);
+    static bool check_obj_is_true(model::Object* obj);
     static void call_function(model::Object* func_obj, model::Object* args_obj, model::Object* self);
 
 private:

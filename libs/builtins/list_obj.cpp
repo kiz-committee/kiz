@@ -66,19 +66,19 @@ inline auto list_eq = [](Object* self, const List* args) -> Object* {
         const auto elem_eq_method = kiz::Vm::get_attr(self_elem, "__eq__");
         assert(elem_eq_method != nullptr && "Element must implement __eq__ method");
         
-        // 调用 __eq__ 
-        auto eq_result = kiz::Vm::call_function(
-            elem_eq_method, new List({another_elem}), self_elem
-        );
-        
-        // 解析比较结果
-        const auto eq_bool = dynamic_cast<Bool*>(eq_result);
-        assert(eq_bool != nullptr && "__eq__ method must return Bool type");
-        
-        // 任意元素不相等，返回 false
-        if (!eq_bool->val) {
-            return new Bool(false);
-        }
+        // // 调用 __eq__
+        // kiz::Vm::call_function(
+        //     elem_eq_method, new List({another_elem}), self_elem
+        // );
+        //
+        // // 解析比较结果
+        // const auto eq_bool = dynamic_cast<Bool*>(eq_result);
+        // assert(eq_bool != nullptr && "__eq__ method must return Bool type");
+        //
+        // // 任意元素不相等，返回 false
+        // if (!eq_bool->val) {
+        //     return new Bool(false);
+        // }
     }
     
     // 所有元素均相等，返回 true
@@ -96,23 +96,23 @@ inline auto list_contains = [](Object* self, const List* args) -> Object* {
     Object* target_elem = args->val[0];
     assert(target_elem != nullptr && "List.contains target argument cannot be nullptr");
     
-    // 遍历列表元素，逐个判断是否与目标元素相等
-    for (Object* elem : self_list->val) {
-        const auto elem_eq_method = kiz::Vm::get_attr(elem, "__eq__");
-
-        auto result = kiz::Vm::call_function(
-            elem_eq_method, new List({target_elem}), elem
-        );
-    
-        const auto result_val = dynamic_cast<Bool*>(result);
-        assert(result_val!=nullptr);
-        
-        // 找到匹配元素，立即返回true
-        if (result_val->val == true) {
-            result_val->make_ref();
-            return result_val;
-        }
-    }
+    // // 遍历列表元素，逐个判断是否与目标元素相等
+    // for (Object* elem : self_list->val) {
+    //     const auto elem_eq_method = kiz::Vm::get_attr(elem, "__eq__");
+    //
+    //     auto result = kiz::Vm::call_function(
+    //         elem_eq_method, new List({target_elem}), elem
+    //     );
+    //
+    //     const auto result_val = dynamic_cast<Bool*>(result);
+    //     assert(result_val!=nullptr);
+    //
+    //     // 找到匹配元素，立即返回true
+    //     if (result_val->val == true) {
+    //         result_val->make_ref();
+    //         return result_val;
+    //     }
+    // }
     
     // 遍历完未找到匹配元素，返回false
     return new Bool(false);

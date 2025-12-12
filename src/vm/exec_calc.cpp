@@ -22,84 +22,48 @@ std::tuple<model::Object*, model::Object*> Vm::fetch_two_from_stack_top(
 
 // -------------------------- 算术指令 --------------------------
 void Vm::exec_ADD(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec add...");
     auto [a, b] = fetch_two_from_stack_top("add");
     DEBUG_OUTPUT("a is " + a->to_string() + ", b is " + b->to_string());
 
     call_function(get_attr(a, "__add__"), new model::List({b}), a);
     DEBUG_OUTPUT("success to call function");
-
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 void Vm::exec_SUB(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec sub...");
     auto [a, b] = fetch_two_from_stack_top("sub");
 
     call_function(get_attr(a, "__sub__"), new model::List({b}), a);
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 void Vm::exec_MUL(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec mul...");
     auto [a, b] = fetch_two_from_stack_top("mul");
 
     call_function(get_attr(a, "__mul__"), new model::List({b}), a);
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 void Vm::exec_DIV(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec div...");
     auto [a, b] = fetch_two_from_stack_top("div");
 
     call_function(get_attr(a, "__div__"), new model::List({b}), a);
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 void Vm::exec_MOD(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec mod...");
     auto [a, b] = fetch_two_from_stack_top("mod");
 
     call_function(get_attr(a, "__mod__"), new model::List({b}), a);
 
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 void Vm::exec_POW(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec pow...");
     auto [a, b] = fetch_two_from_stack_top("pow");
 
     call_function(get_attr(a, "__pow__"), new model::List({b}), a);
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 void Vm::exec_NEG(const Instruction& instruction) {
@@ -121,55 +85,62 @@ void Vm::exec_NEG(const Instruction& instruction) {
 
 // -------------------------- 比较指令 --------------------------
 void Vm::exec_EQ(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec eq...");
     auto [a, b] = fetch_two_from_stack_top("eq");
 
     call_function(get_attr(a, "__eq__"), new model::List({b}), a);
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 void Vm::exec_GT(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec gt...");
     auto [a, b] = fetch_two_from_stack_top("gt");
 
     call_function(get_attr(a, "__gt__"), new model::List({b}), a);
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 void Vm::exec_LT(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
-
     DEBUG_OUTPUT("exec lt...");
     auto [a, b] = fetch_two_from_stack_top("lt");
 
     call_function(get_attr(a, "__lt__"), new model::List({b}), a);
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 // -------------------------- 逻辑指令 --------------------------
 void Vm::exec_AND(const Instruction& instruction) {
-    // a: ...
+    DEBUG_OUTPUT("exec and...");
+    if (op_stack_.size() < 2) {
+        assert(false && "OP_AND: 操作数栈元素不足（需≥2）");
+    }
+    auto [a, b] = fetch_two_from_stack_top("and");
+    if (check_obj_is_true(a) && check_obj_is_true(b))
+    {
+        op_stack_.emplace(new model::Bool(true));
+    }
 }
 
 void Vm::exec_NOT(const Instruction& instruction) {
-    // a: ...
+    DEBUG_OUTPUT("exec not...");
+    if (op_stack_.size() < 1) {
+        assert(false && "OP_NOT: 操作数栈元素不足（需≥1）");
+    }
+    auto a = op_stack_.top();
+    op_stack_.pop();
+    if (!check_obj_is_true(a))
+    {
+        op_stack_.emplace(new model::Bool(true));
+    }
 }
 
 void Vm::exec_OR(const Instruction& instruction) {
-    // a: ...
+    DEBUG_OUTPUT("exec or...");
+    if (op_stack_.size() < 2) {
+        assert(false && "OP_OR: 操作数栈元素不足（需≥2）");
+    }
+    auto [a, b] = fetch_two_from_stack_top("or");
+    if (check_obj_is_true(a) || check_obj_is_true(b))
+    {
+        op_stack_.emplace(new model::Bool(true));
+    }
 }
 
 void Vm::exec_IS(const Instruction& instruction) {
@@ -177,27 +148,19 @@ void Vm::exec_IS(const Instruction& instruction) {
     if (op_stack_.size() < 2) {
         assert(false && "OP_IS: 操作数栈元素不足（需≥2）");
     }
-    model::Object* b = op_stack_.top();
-    op_stack_.pop();
-    model::Object* a = op_stack_.top();
-    op_stack_.pop();
+    auto [a, b] = fetch_two_from_stack_top("is");
 
-    bool is_same = (a == b);
+    bool is_same = a == b;
     auto* result = new model::Bool(is_same);
+    op_stack_.push(result);
 }
 
 // -------------------------- 容器指令 --------------------------
 void Vm::exec_IN(const Instruction& instruction) {
-    const auto raw_call_stack_count = call_stack_.size();
     DEBUG_OUTPUT("exec in...");
     auto [a, b] = fetch_two_from_stack_top("in");
 
     call_function(get_attr(a, "__contains__"), new model::List({b}), a);
-
-
-    if (raw_call_stack_count != call_stack_.size()) {
-        exec_RET({});
-    }
 }
 
 }

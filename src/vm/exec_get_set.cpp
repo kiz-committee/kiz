@@ -1,5 +1,6 @@
 #include <cassert>
 
+#include "models.hpp"
 #include "vm.hpp"
 
 namespace kiz {
@@ -55,10 +56,11 @@ void Vm::exec_LOAD_CONST(const Instruction& instruction) {
         assert(false && "LOAD_CONST: 无常量索引");
     }
     size_t const_idx = instruction.opn_list[0];
-    if (const_idx >= constant_pool_.size()) {
+    CallFrame* frame = call_stack_.back().get();
+    if (const_idx >= frame->code_object->consts.size()) {
         assert(false && "LOAD_CONST: 常量索引超出范围");
     }
-    model::Object* const_val = constant_pool_[const_idx];
+    model::Object* const_val = frame->code_object->consts[const_idx];
     DEBUG_OUTPUT("ok to get load const [" + std::to_string(const_idx) + "]: "+ const_val->to_string());
     const_val->make_ref();
     op_stack_.push(const_val);

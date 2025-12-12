@@ -1,6 +1,7 @@
 
 #include <cassert>
 
+#include "models.hpp"
 #include "vm.hpp"
 
 namespace kiz {
@@ -62,8 +63,6 @@ void Vm::call_function(model::Object* func_obj, model::Object* args_obj, model::
                             "个，实际" + std::to_string(actual_argc) + "个）").c_str());
         }
 
-        constant_pool_ = func->code->consts;
-
         // 创建新调用帧
         auto new_frame = std::make_unique<CallFrame>();
         new_frame->name = func->name;
@@ -103,8 +102,8 @@ void Vm::call_function(model::Object* func_obj, model::Object* args_obj, model::
         func_obj->del_ref();
         args_obj->del_ref();
     // 处理对象魔术方法__call__
-    } else if (auto callable_obj = func_obj->find("__call__")) {
-        call_function(callable_obj, args_obj, self);
+    } else if (const auto callable_it = func_obj->attrs.find("__call__")) {
+        call_function(callable_it->value, args_obj, self);
         func_obj->del_ref();
         args_obj->del_ref();
     } else {
@@ -158,7 +157,15 @@ void Vm::exec_CALL_METHOD(const Instruction& instruction) {
     DEBUG_OUTPUT("弹出对象: " + obj->to_string());
     DEBUG_OUTPUT("弹出参数列表: " + args_obj->to_string());
 
-    auto func_obj = get_attr(obj, instruction[0]);
+    size_t name_idx = instruction.opn_list[0];
+    CallFrame* curr_frame = call_stack_.back().get();
+
+    if (name_idx >= curr_frame->names.size()) {
+        assert(false && "GET_ATTR: 属性名索引超出范围");
+    }
+    std::string attr_name = curr_frame->names[name_idx];
+
+    auto func_obj = get_attr(obj, attr_name);
     func_obj->make_ref();
 
     DEBUG_OUTPUT("获取函数对象: " + func_obj->to_string());
@@ -166,6 +173,15 @@ void Vm::exec_CALL_METHOD(const Instruction& instruction) {
     call_function(func_obj, args_obj, obj);
 
 }
+
+bool Vm::check_obj_is_true(model::Object* obj) {
+    if (auto bool_obj = dynamic_cast<const model::Bool*>(obj)) {
+        return bool_obj->val==true ? true : false;
+    }
+
+    return call_function(get_attr(obj, "__bool__"), new model::List({}), obj);
+}
+
 
 void Vm::exec_RET(const Instruction& instruction) {
     DEBUG_OUTPUT("exec ret...");
@@ -191,8 +207,6 @@ void Vm::exec_RET(const Instruction& instruction) {
         op_stack_.pop();
         return_val->make_ref();
     }
-
-    constant_pool_ = caller_frame->code_object->consts;
 
     caller_frame->pc = curr_frame->return_to_pc;
     op_stack_.push(return_val);

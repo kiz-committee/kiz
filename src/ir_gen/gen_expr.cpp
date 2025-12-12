@@ -194,7 +194,7 @@ void IRGenerator::gen_expr(Expression* expr) {
             );
             break;
         }
-        case NilExpr : {
+        case AstType::NilExpr : {
             const auto nil = new model::Nil();
             const size_t nil_idx = get_or_add_const(curr_consts, nil);
             curr_code_list.emplace_back(
@@ -205,7 +205,7 @@ void IRGenerator::gen_expr(Expression* expr) {
             );
             break;
         }
-        case BoolExpr : {
+        case AstType::BoolExpr : {
             const auto bool_ast = dynamic_cast<BoolExpr*>(expr);
             assert(bool_ast!=nullptr);
             const auto bool_obj = new model::Bool(bool_ast->val);
