@@ -58,7 +58,11 @@ public:
     static VmState get_vm_state();
     static void exec(const Instruction& instruction);
     static std::tuple<model::Object*, model::Object*> fetch_two_from_stack_top(const std::string& curr_instruction_name);
+
     static model::Object* get_attr(const model::Object* obj, const std::string& attr);
+    static std::string get_obj_to_str(const model::Object* obj);
+    static std::string get_obj_debug_str(const model::Object* obj);
+    static bool check_obj_is_true(const model::Object* obj);
     static void call_function(model::Object* func_obj, model::Object* args_obj, model::Object* self);
 
 private:
