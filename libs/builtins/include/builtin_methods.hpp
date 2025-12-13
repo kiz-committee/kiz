@@ -5,59 +5,63 @@
 
 namespace model {
 
-using NativeFuncPtr = std::function<Object*(Object*, const List*)>;
+// Int 类型原生函数
+Object* int_add(Object* self, const List* args);
+Object* int_sub(Object* self, const List* args);
+Object* int_mul(Object* self, const List* args);
+Object* int_div(Object* self, const List* args);
+Object* int_pow(Object* self, const List* args);
+Object* int_mod(Object* self, const List* args);
+Object* int_eq(Object* self, const List* args);
+Object* int_lt(Object* self, const List* args);
+Object* int_gt(Object* self, const List* args);
+Object* int_str(Object* self, const List* args);
+Object* int_repr(Object* self, const List* args);
 
-inline NativeFuncPtr int_add;
-inline NativeFuncPtr int_sub;
-inline NativeFuncPtr int_mul;
-inline NativeFuncPtr int_div;
-inline NativeFuncPtr int_pow;
-inline NativeFuncPtr int_mod;
-inline NativeFuncPtr int_eq;
-inline NativeFuncPtr int_lt;
-inline NativeFuncPtr int_gt;
-inline NativeFuncPtr int_str;
-inline NativeFuncPtr int_repr;
+// Rational 类型原生函数
+Object* rational_add(Object* self, const List* args);
+Object* rational_sub(Object* self, const List* args);
+Object* rational_mul(Object* self, const List* args);
+Object* rational_div(Object* self, const List* args);
+Object* rational_pow(Object* self, const List* args);
+Object* rational_eq(Object* self, const List* args);
+Object* rational_lt(Object* self, const List* args);
+Object* rational_gt(Object* self, const List* args);
+Object* rational_str(Object* self, const List* args);
+Object* rational_repr(Object* self, const List* args);
 
-inline NativeFuncPtr rational_add;
-inline NativeFuncPtr rational_sub;
-inline NativeFuncPtr rational_mul;
-inline NativeFuncPtr rational_div;
-inline NativeFuncPtr rational_pow;
-inline NativeFuncPtr rational_eq;
-inline NativeFuncPtr rational_lt;
-inline NativeFuncPtr rational_gt;
-inline NativeFuncPtr rational_str;
-inline NativeFuncPtr rational_repr;
+// Nil 类型原生函数
+Object* nil_eq(Object* self, const List* args);
+Object* nil_str(Object* self, const List* args);
+Object* nil_repr(Object* self, const List* args);
 
-inline NativeFuncPtr nil_eq;
-inline NativeFuncPtr nil_str;
-inline NativeFuncPtr nil_repr;
+// Bool 类型原生函数
+Object* bool_eq(Object* self, const List* args);
+Object* bool_str(Object* self, const List* args);
+Object* bool_repr(Object* self, const List* args);
 
-inline NativeFuncPtr bool_eq;
-inline NativeFuncPtr bool_str;
-inline NativeFuncPtr bool_repr;
+// String 类型原生函数
+Object* str_eq(Object* self, const List* args);
+Object* str_add(Object* self, const List* args);
+Object* str_mul(Object* self, const List* args);
+Object* str_contains(Object* self, const List* args);
+Object* str_str(Object* self, const List* args);
+Object* str_repr(Object* self, const List* args);
 
-inline NativeFuncPtr str_eq;
-inline NativeFuncPtr str_add;
-inline NativeFuncPtr str_mul;
-inline NativeFuncPtr str_contains;
-inline NativeFuncPtr str_str;
-inline NativeFuncPtr str_repr;
+// Dict 类型原生函数
+Object* dict_eq(Object* self, const List* args);
+Object* dict_add(Object* self, const List* args);
+Object* dict_contains(Object* self, const List* args);
+Object* dict_str(Object* self, const List* args);
+Object* dict_repr(Object* self, const List* args);
 
-inline NativeFuncPtr dict_eq;
-inline NativeFuncPtr dict_add;
-inline NativeFuncPtr dict_contains;
-inline NativeFuncPtr dict_str;
-inline NativeFuncPtr dict_repr;
-
-inline NativeFuncPtr list_eq;
-inline NativeFuncPtr list_add;
-inline NativeFuncPtr list_mul;
-inline NativeFuncPtr list_contains;
-inline NativeFuncPtr list_append;
-inline NativeFuncPtr list_str;
-inline NativeFuncPtr list_repr;
-
+// List 类型原生函数
+Object* list_eq(Object* self, const List* args);
+Object* list_add(Object* self, const List* args);
+Object* list_mul(Object* self, const List* args);
+Object* list_contains(Object* self, const List* args);
+Object* list_append(Object* self, const List* args);
+Object* list_str(Object* self, const List* args);
+Object* list_repr(Object* self, const List* args);
 
 }
