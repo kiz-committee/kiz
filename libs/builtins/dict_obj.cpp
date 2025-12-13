@@ -2,8 +2,8 @@
 
 namespace model {
 
-// Dictionary.add：添加键值对 self + x（key: String，value: 任意Object），返回新Dictionary（不可变语义）
-inline auto dict_add = [](Object* self, const List* args) -> Object* {
+// Dictionary.__add__：添加键值对 self + x（key: String，value: 任意Object），返回新Dictionary（不可变语义）
+model::Object* dict_add(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (dict_add)");
     assert(args->val.size() == 2 && "function Dictionary.add need 2 args: (key: String, value: Object)");
     
@@ -23,8 +23,8 @@ inline auto dict_add = [](Object* self, const List* args) -> Object* {
     return new Dictionary(new_attrs);
 };
 
-// Dictionary.contains：x in self 判断是否包含指定键（key: String），返回Bool
-inline auto dict_contains = [](Object* self, const List* args) -> Object* {
+// Dictionary.__contains__：x in self 判断是否包含指定键（key: String），返回Bool
+model::Object* dict_contains(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (dict_contains)");
     assert(args->val.size() == 1 && "function Dictionary.contains need 1 arg: (key: String)");
     
