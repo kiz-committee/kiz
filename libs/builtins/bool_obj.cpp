@@ -2,7 +2,7 @@
 
 namespace model {
 
-// 布尔值相等判断：self == args[0]（仅支持Bool与Bool比较）
+// Bool.__eq__ 布尔值相等判断：self == args[0]（仅支持Bool与Bool比较）
 model::Object* bool_eq(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (bool_eq)");
     assert(args->val.size() == 1 && "function Bool.eq need 1 arg");
