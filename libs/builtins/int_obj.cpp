@@ -3,8 +3,8 @@
 
 namespace model {
 
-// 整数加法：self + args[0]
-inline auto int_add = [](Object* self, const List* args) -> Object* {
+// Int.__add__ 整数加法：self + args[0]
+model::Object* int_add(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments");
     assert(args->val.size() == 1 && "function Int.add need 1 arg");
 
@@ -22,8 +22,8 @@ inline auto int_add = [](Object* self, const List* args) -> Object* {
     assert(false && "function Int.add second arg need be Rational or Int");
 };
 
-// 整数减法：self - args[0]
-inline auto int_sub = [](Object* self, const List* args) -> Object* {
+// Int.__sub__ 整数减法：self - args[0]
+model::Object* int_sub(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (int_sub)");
     assert(args->val.size() == 1 && "function Int.sub need 1 arg");
     
@@ -40,8 +40,8 @@ inline auto int_sub = [](Object* self, const List* args) -> Object* {
     assert(false && "function Int.sub second arg need be Rational or Int");
 };
 
-// 整数乘法：self * args[0]
-inline auto int_mul = [](Object* self, const List* args) -> Object* {
+// Int.__mul__ 整数乘法：self * args[0]
+model::Object* int_mul(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (int_mul)");
     assert(args->val.size() == 1 && "function Int.mul need 1 arg");
     
@@ -58,8 +58,8 @@ inline auto int_mul = [](Object* self, const List* args) -> Object* {
     assert(false && "function Int.mul second arg need be Rational or Int");
 };
 
-// 整数除法 self / args[0]
-inline auto int_div = [](Object* self, const List* args) -> Object* {
+// Int.__div__ 整数除法 self / args[0]
+model::Object* int_div(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (int_div)");
     assert(args->val.size() == 1 && "function Int.div need 1 arg");
 
@@ -76,8 +76,8 @@ inline auto int_div = [](Object* self, const List* args) -> Object* {
     assert(false && "function Int.div second arg need be Rational or Int");
 };
 
-// 整数幂运算：self ^ args[0]（self的args[0]次方）
-inline auto int_pow = [](Object* self, const List* args) -> Object* {
+// Int.__pow__ 整数幂运算：self ^ args[0]（self的args[0]次方）
+model::Object* int_pow(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (int_pow)");
     assert(args->val.size() == 1 && "function Int.pow need 1 arg");
     
@@ -86,8 +86,8 @@ inline auto int_pow = [](Object* self, const List* args) -> Object* {
     return new Int(self_int->val.pow(exp_int->val));
 };
 
-// 整数取模：self % args[0]（余数与除数同号）
-inline auto int_mod = [](Object* self, const List* args) -> Object* {
+// Int.__mod__ 整数取模：self % args[0]（余数与除数同号）
+model::Object* int_mod(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (int_mod)");
     assert(args->val.size() == 1 && "function Int.mod need 1 arg");
     assert(dynamic_cast<Int*>(args->val[0])->val != deps::BigInt(0) && "mod by zero");
@@ -104,8 +104,8 @@ inline auto int_mod = [](Object* self, const List* args) -> Object* {
     return new Int(deps::BigInt(remainder));
 };
 
-// 相等判断：self == args[0]（返回Bool对象）
-inline auto int_eq = [](Object* self, const List* args) -> Object* {
+// Int.__eq__ 相等判断：self == args[0]（返回Bool对象）
+model::Object* int_eq(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (int_eq)");
     assert(args->val.size() == 1 && "function Int.eq need 1 arg");
     
@@ -122,8 +122,8 @@ inline auto int_eq = [](Object* self, const List* args) -> Object* {
     assert(false && "function Int.eq second arg need be Rational or Int");
 };
 
-// 小于判断：self < args[0]（返回Bool对象）
-inline auto int_lt = [](Object* self, const List* args) -> Object* {
+// Int.__lt__ 小于判断：self < args[0]（返回Bool对象）
+model::Object* int_lt(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (int_lt)");
     assert(args->val.size() == 1 && "function Int.lt need 1 arg");
     
@@ -140,8 +140,8 @@ inline auto int_lt = [](Object* self, const List* args) -> Object* {
     assert(false && "function Int.lt second arg need be Rational or Int");
 };
 
-// 大于判断：self > args[0]（返回Bool对象）
-inline auto int_gt = [](Object* self, const List* args) -> Object* {
+// Int.__gt__ 大于判断：self > args[0]（返回Bool对象）
+model::Object* int_gt(model::Object* self, const model::List* args) {
     DEBUG_OUTPUT("You given " + std::to_string(args->val.size()) + " arguments (int_gt)");
     assert(args->val.size() == 1 && "function Int.gt need 1 arg");
     
