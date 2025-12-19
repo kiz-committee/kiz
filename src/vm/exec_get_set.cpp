@@ -22,20 +22,24 @@ void Vm::exec_LOAD_VAR(const Instruction& instruction) {
     if (call_stack_.empty() || instruction.opn_list.empty()) {
         assert(false && "LOAD_VAR: 无调用帧或无变量名索引");
     }
-    const CallFrame* curr_frame = call_stack_.back().get();
+
     size_t name_idx = instruction.opn_list[0];
-    DEBUG_OUTPUT("current name list len is "+std::to_string(curr_frame->names.size()));
-
-    if (name_idx >= curr_frame->names.size()) {
-        assert(false && "LOAD_VAR: 变量名索引超出范围");
+    std::string var_name;
+    
+    // 遍历调用栈
+    assert(call_stack_ != nullptr);
+    model::Object* var_it;
+    for (auto frame_it = call_stack_.rbegin(); frame_it != call_stack_.rend(); ++frame_it) {
+        CallFrame* curr_frame = (*frame_it).get();
+        
+        var_name = curr_frame->names[name_idx];
+        var_it = curr_frame->locals.find(var_name);
+        if (var_it) break;
     }
-    DEBUG_OUTPUT("current local at [" + std::to_string(call_stack_.size()) + "] " +  curr_frame->locals.to_string());
-    const std::string var_name = curr_frame->names[name_idx];
-    DEBUG_OUTPUT("ok to get var name: " + var_name);
 
-    const auto var_it = curr_frame->locals.find(var_name);
-
-    if (var_it == nullptr) {
+    if (var == nullptr) {
+        DEBUG_OUTPUT("try to find in builtins (getting var name)");
+        var_name = call_stack_.back().get()-> names[name_idx];
         DEBUG_OUTPUT("current builtins: " + builtins.to_string());
         DEBUG_OUTPUT("var_name="+var_name);
         if (auto builtin_it = builtins.find(var_name)) {
