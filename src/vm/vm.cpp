@@ -53,7 +53,7 @@ Vm::Vm(const std::string& file_path_) {
 
     DEBUG_OUTPUT("registering magic methods...");
 
-        // Object 基类 __eq__
+    // Object 基类 __eq__
     model::based_obj->attrs.insert("__eq__", new model::CppFunction([](const model::Object* self, const model::List* args) -> model::Object* {
         const auto other_obj = builtin::get_one_arg(args);
         return new model::Bool(self == other_obj);
@@ -61,6 +61,7 @@ Vm::Vm(const std::string& file_path_) {
 
     // Bool 类型魔法方法
     model::based_bool->attrs.insert("__eq__", new model::CppFunction(model::bool_eq));
+    model::based_bool->attrs.insert("__call__", new model::CppFunction(model::bool_call));
 
     // Nil 类型魔法方法
     model::based_nil->attrs.insert("__eq__", new model::CppFunction(model::nil_eq));
@@ -75,6 +76,8 @@ Vm::Vm(const std::string& file_path_) {
     model::based_int->attrs.insert("__gt__", new model::CppFunction(model::int_gt));
     model::based_int->attrs.insert("__lt__", new model::CppFunction(model::int_lt));
     model::based_int->attrs.insert("__eq__", new model::CppFunction(model::int_eq));
+    model::based_int->attrs.insert("__call__", new model::CppFunction(model::int_call));
+    model::based_int->attrs.insert("__bool__", new model::CppFunction(model::int_bool));
 
     // Rational 类型魔法方法
     model::based_rational->attrs.insert("__add__", new model::CppFunction(model::rational_add));
@@ -92,16 +95,19 @@ Vm::Vm(const std::string& file_path_) {
     // List 类型魔法方法
     model::based_list->attrs.insert("__add__", new model::CppFunction(model::list_add));
     model::based_list->attrs.insert("__mul__", new model::CppFunction(model::list_mul));
-    model::based_list->attrs.insert("__contains__", new model::CppFunction(model::list_contains));
     model::based_list->attrs.insert("__eq__", new model::CppFunction(model::list_eq));
+    model::based_list->attrs.insert("__call__", new model::CppFunction(model::list_call));
+    model::based_list->attrs.insert("__bool__", new model::CppFunction(model::list_bool));
     model::based_list->attrs.insert("append", new model::CppFunction(model::list_append));
-
+    model::based_list->attrs.insert("contains", new model::CppFunction(model::list_contains));
+    
     // String 类型魔法方法
     model::based_str->attrs.insert("__add__", new model::CppFunction(model::str_add));
     model::based_str->attrs.insert("__mul__", new model::CppFunction(model::str_mul));
-    model::based_str->attrs.insert("__contains__", new model::CppFunction(model::str_contains));
     model::based_str->attrs.insert("__eq__", new model::CppFunction(model::str_eq));
-
+    model::based_str->attrs.insert("__call__", new model::CppFunction(model::str_call));
+    model::based_str->attrs.insert("__bool__", new model::CppFunction(model::str_bool));
+    model::based_str->attrs.insert("contains", new model::CppFunction(model::str_contains));
 
     builtins.insert("int", model::based_int);
     builtins.insert("bool", model::based_bool);
@@ -124,7 +130,7 @@ void Vm::load(model::Module* src_module) {
 
     // 创建模块级调用帧（CallFrame）：模块是顶层执行单元，对应一个顶层调用帧
     auto module_call_frame = std::make_unique<CallFrame>();
-    module_call_frame->is_week_scope = false;          // 模块作用域为"强作用域"
+    module_call_frame->attrs = src_module->attrs;
     module_call_frame->locals = deps::HashMap<model::Object*>(); // 初始空局部变量表
     module_call_frame->pc = 0;                         // 程序计数器初始化为0（从第一条指令开始执行）
     module_call_frame->return_to_pc = src_module->code->code.size(); // 执行完所有指令后返回的位置（指令池末尾）
@@ -205,7 +211,6 @@ void Vm::extend_code(const model::CodeObject* code_object) {
     const size_t prev_name_count = global_code_obj.names.size();
     global_code_obj.names.clear();
     global_code_obj.names = code_object->names; // 覆盖 CodeObject 的 names
-    curr_frame.names = global_code_obj.names;
     DEBUG_OUTPUT("extend_code: 覆盖名称表：原有 "
         + std::to_string(prev_name_count)
         + " 个 → 新 "
@@ -260,17 +265,9 @@ void Vm::load_required_modules(const deps::HashMap<model::Module*>& modules) {
     loaded_modules = modules;
 }
 
-VmState Vm::get_vm_state() {
-    // 构造并返回当前虚拟机状态
-    VmState state;
-    // 栈顶：操作数栈非空则为栈顶元素，否则为nullptr
-    state.stack_top = op_stack_.empty() ? nullptr : op_stack_.top();
-    // 局部变量：当前调用帧的locals，无调用帧则为空
-    state.locals = call_stack_.empty()
-        ? deps::HashMap<model::Object*>()
-        : call_stack_.back()->locals;
-
-    return state;
+model::Object* Vm::get_stack_top() {
+    auto stack_top = op_stack_.empty() ? nullptr : op_stack_.top();
+    return stack_top;
 }
 
 void Vm::exec(const Instruction& instruction) {
