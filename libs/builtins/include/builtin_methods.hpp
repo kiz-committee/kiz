@@ -28,6 +28,7 @@ Object* rational_div(Object* self, const List* args);
 Object* rational_eq(Object* self, const List* args);
 Object* rational_lt(Object* self, const List* args);
 Object* rational_gt(Object* self, const List* args);
+
 // Nil 类型原生函数
 Object* nil_eq(Object* self, const List* args);
 
