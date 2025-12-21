@@ -187,40 +187,19 @@ std::unique_ptr<Expression> Parser::parse_primary() {
         return std::make_unique<IdentifierExpr>(tok.text);
     }
     if (tok.type == TokenType::Func) {
-        skip_token("fn");
         // 读取函数名（必须是标识符）
-        const Token func_name_tok = skip_token();
-        if (func_name_tok.type != TokenType::Identifier) {
-            // std::cerr << Color::RED
-            //           << "[Syntax Error] Function name must be an identifier, got '"
-            //           << func_name_tok.text << "' (Line: " << func_name_tok.line << ")"
-            //           << Color::RESET << std::endl;
-            // assert(false && "Invalid function name");
-        }
-        const std::string func_name = func_name_tok.text;
+        const std::string func_name = skip_token().text;
 
         // 解析参数列表（()包裹，逻辑不变）
         std::vector<std::string> func_params;
         if (curr_token().type == TokenType::LParen) {
             skip_token("(");
             while (curr_token().type != TokenType::RParen) {
-                const Token param_tok = skip_token();
-                if (param_tok.type != TokenType::Identifier) {
-                    std::cerr << Color::RED
-                              << "[Syntax Error] Function parameter must be an identifier, got '"
-                              << param_tok.text << "' (Line: " << param_tok.pos.lno_start << ")"
-                              << Color::RESET << std::endl;
-                    assert(false && "Invalid function parameter");
-                }
-                func_params.push_back(param_tok.text);
+                func_params.push_back(skip_token().text);
                 // 处理参数间的逗号
                 if (curr_token().type == TokenType::Comma) {
                     skip_token(",");
                 } else if (curr_token().type != TokenType::RParen) {
-                    std::cerr << Color::RED
-                              << "[Syntax Error] Expected ',' or ')' in function parameters, got '"
-                              << curr_token().text << "'"
-                              << Color::RESET << std::endl;
                     assert(false && "Mismatched function parameters");
                 }
             }
