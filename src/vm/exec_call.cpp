@@ -87,7 +87,6 @@ void Vm::call_function(model::Object* func_obj, model::Object* args_obj, model::
             0,                               // 程序计数器初始化为0（从第一条指令开始执行）
             call_stack_.back()->pc + 1,   // 执行完所有指令后返回的位置（指令池末尾）
             func->code,                 // 关联当前模块的CodeObject
-            call_stack_.back()->code_object->code[call_stack_.back()->pc].pos
         );
 
         // 储存self
