@@ -43,7 +43,6 @@ struct CallFrame {
     size_t pc = 0;
     size_t return_to_pc;
     model::CodeObject* code_object;
-    err::PositionInfo call_pos;
 };
 
 class Vm {
