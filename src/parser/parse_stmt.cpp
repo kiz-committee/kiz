@@ -190,6 +190,42 @@ std::unique_ptr<Statement> Parser::parse_stmt() {
         return std::make_unique<ThrowStmt>(tok.pos, std::move(expr));
     }
 
+    // 解析for语句
+    if (curr_tok.type == TokenType::For) {
+        DEBUG_OUTPUT("parsing for");
+        auto tok = skip_token("for");
+        const std::string name = skip_token().text;
+        skip_token(":");
+        std::unique_ptr<Expression> expr = parse_expression();
+
+        skip_start_of_block();
+        auto for_block = parse_block();
+        skip_token("end");
+        return std::make_unique<ForStmt>(tok.pos, name, std::move(expr), std::move(for_block));
+    }
+
+    // 解析try语句
+    if (curr_tok.type == TokenType::Try) {
+        DEBUG_OUTPUT("parsing try");
+        auto tok = skip_token("try");
+        
+        skip_start_of_block();
+        auto try_block = parse_block();
+        skip_token("end");
+
+        std::vector<std::unique_ptr<Statement>> catch_blocks;
+        auto block_tok = curr_token();
+
+        while (curr_tok().type != TokenType::End) {
+            catch_blocks.push_back(parse_block(TokenType::Catch));
+            skip_token("catch");
+        }
+        skip_token("end");
+        assert(!catch_blocks.empty());
+
+        return std::make_unique<TryStmt>(tok.pos, std::move(try_block), std::move(catch_blocks));
+    }
+
     // 解析global语句
     if (curr_tok.type == TokenType::Global) {
         DEBUG_OUTPUT("parsing global");
