@@ -222,7 +222,7 @@ std::unique_ptr<Statement> Parser::parse_stmt() {
         
         skip_start_of_block();
         auto try_block = parse_block(TokenType::Catch);
-        assert(curr_token().TokenType == Token::Catch);
+        assert(curr_token().type == TokenType::Catch);
 
         std::vector<std::unique_ptr<CatchStmt>> catch_blocks;
         auto block_tok = curr_token();
