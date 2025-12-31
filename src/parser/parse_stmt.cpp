@@ -180,6 +180,17 @@ std::unique_ptr<Statement> Parser::parse_stmt() {
         skip_end_of_ln();
         return std::make_unique<NonlocalAssignStmt>(tok.pos, name, std::move(expr));
     }
+
+    // 解析global语句
+    if (curr_tok.type == TokenType::Global) {
+        DEBUG_OUTPUT("parsing global");
+        auto tok = skip_token("global");
+        const std::string name = skip_token().text;
+        skip_token("=");
+        std::unique_ptr<Expression> expr = parse_expression();
+        skip_end_of_ln();
+        return std::make_unique<GlobalAssignStmt>(tok.pos, name, std::move(expr));
+    }
     
     // 解析throw语句
     if (curr_tok.type == TokenType::Throw) {
@@ -204,6 +215,20 @@ std::unique_ptr<Statement> Parser::parse_stmt() {
         return std::make_unique<ForStmt>(tok.pos, name, std::move(expr), std::move(for_block));
     }
 
+    // 解析catch语句
+    if (curr_tok.type == TokenType::Catch) {
+        DEBUG_OUTPUT("parsing catch");
+        auto tok = skip_token("catch");
+        const std::string name = skip_token().text;
+        skip_token(":");
+        std::unique_ptr<Expression> expr = parse_expression();
+
+        skip_start_of_block();
+        auto catch_block = parse_block(TokenType::Catch);
+        skip_token("end");
+        return std::make_unique<CatchStmt>(tok.pos, name, std::move(expr), std::move(catch_block));
+    }
+
     // 解析try语句
     if (curr_tok.type == TokenType::Try) {
         DEBUG_OUTPUT("parsing try");
@@ -224,17 +249,6 @@ std::unique_ptr<Statement> Parser::parse_stmt() {
         assert(!catch_blocks.empty());
 
         return std::make_unique<TryStmt>(tok.pos, std::move(try_block), std::move(catch_blocks));
-    }
-
-    // 解析global语句
-    if (curr_tok.type == TokenType::Global) {
-        DEBUG_OUTPUT("parsing global");
-        auto tok = skip_token("global");
-        const std::string name = skip_token().text;
-        skip_token("=");
-        std::unique_ptr<Expression> expr = parse_expression();
-        skip_end_of_ln();
-        return std::make_unique<GlobalAssignStmt>(tok.pos, name, std::move(expr));
     }
 
     // 解析赋值语句（x = expr;）
