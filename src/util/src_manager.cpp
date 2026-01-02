@@ -13,7 +13,6 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
-#include <mutex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -24,7 +23,6 @@
 namespace err {
 
 dep::HashMap<std::string> SrcManager::opened_files;
-inline std::mutex opened_files_mutex; // 全局锁
 
 /**
  * @brief 从指定文件中提取指定行范围的内容（行号从1开始）
@@ -87,11 +85,11 @@ std::string SrcManager::get_slice(const std::string& src_path, const int& src_li
  */
 std::string SrcManager::get_file_by_path(std::string path) {
     DEBUG_OUTPUT("get_file_by_path");
-    std::lock_guard lock(opened_files_mutex); // 加锁
     // 检查缓存是否已存在该文件
-    auto iter = opened_files.find(path);
-    if (iter != nullptr) {
-        return iter->value;
+    DEBUG_OUPPUT(opened_files.to_string());
+    auto it = opened_files.find(path);
+    if (it != nullptr) {
+        return it->value;
     }
 
     // 缓存未命中，新打开文件并加入缓存
