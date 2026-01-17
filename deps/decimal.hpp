@@ -190,11 +190,21 @@ public:
         return res;
     }
 
-    /// 哈希函数（用于STL容器）
-    [[nodiscard]] size_t hash() const {
+    /// 哈希函数（修改后：返回 BigInt 类型，组合尾数和指数的哈希值）
+    [[nodiscard]] BigInt hash() const {
+        // 计算尾数和指数的 size_t 哈希值
         size_t mant_hash = std::hash<std::string>()(mantissa_.to_string());
         size_t exp_hash = std::hash<int>()(exponent_);
-        return mant_hash ^ (exp_hash << 1);
+
+        // 将 size_t 哈希值转换为 BigInt，并通过位移组合（避免哈希冲突）
+        BigInt mant_big(mant_hash);
+        BigInt exp_big(exp_hash);
+        // 用 64 位位移（适配 size_t 宽度），确保两个哈希值的位域不重叠
+        BigInt shift_base(1);
+        shift_base = shift_base.pow(BigInt(64)); // 1 << 64
+
+        // 组合公式：mant_big * 2^64 + exp_big
+        return mant_big * shift_base + exp_big;
     }
 
     // ========================= 比较运算符 =========================
