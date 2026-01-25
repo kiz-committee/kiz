@@ -36,6 +36,7 @@ std::unique_ptr<Expr> Parser::parse_and_or() {
 std::unique_ptr<Expr> Parser::parse_comparison() {
     DEBUG_OUTPUT("parsing comparison...");
     auto node = parse_add_sub();
+    auto curr_type = curr_token().type;
     while (
         curr_type == TokenType::Equal
         or curr_type == TokenType::NotEqual
