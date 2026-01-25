@@ -18,6 +18,7 @@ Object* int_lt(Object* self, const List* args);
 Object* int_gt(Object* self, const List* args);
 Object* int_bool(Object* self, const List* args);
 Object* int_call(Object* self, const List* args);
+Object* int_hash(Object* self, const List* args);
 
 // Decimal类型原生函数
 Object* decimal_add(Object* self, const List* args);
@@ -58,6 +59,7 @@ Object* str_mul(Object* self, const List* args);
 Object* str_contains(Object* self, const List* args);
 Object* str_call(Object* self, const List* args);
 Object* str_bool(Object* self, const List* args);
+Object* str_hash(Object* self, const List* args);
 
 // Dict 类型原生函数
 Object* dict_eq(Object* self, const List* args);

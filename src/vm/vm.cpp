@@ -151,6 +151,7 @@ CallFrame* Vm::fetch_curr_call_frame() {
 
 model::Object* Vm::fetch_one_from_stack_top() {
     const auto stack_top = op_stack.empty() ? nullptr : op_stack.top();
+    if (stack_top) op_stack.pop();
     return stack_top;
 }
 
@@ -308,6 +309,7 @@ void Vm::execute_instruction(const Instruction& instruction) {
         case Opcode::OP_OR:           exec_OR(instruction);           break;
         case Opcode::OP_IS:           exec_IS(instruction);           break;
         case Opcode::MAKE_LIST:       exec_MAKE_LIST(instruction);    break;
+        case Opcode::MAKE_DICT:       exec_MAKE_DICT(instruction);    break;
 
         case Opcode::CALL:            exec_CALL(instruction);          break;
         case Opcode::RET:             exec_RET(instruction);           break;

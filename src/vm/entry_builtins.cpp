@@ -82,6 +82,7 @@ void Vm::entry_builtins() {
     model::based_int->attrs.insert("__eq__", new model::NativeFunction(model::int_eq));
     model::based_int->attrs.insert("__call__", new model::NativeFunction(model::int_call));
     model::based_int->attrs.insert("__bool__", new model::NativeFunction(model::int_bool));
+    model::based_int->attrs.insert("__hash__", new model::NativeFunction(model::int_hash));
 
     // Decimal类型魔术方法
     model::based_decimal->attrs.insert("__add__", new model::NativeFunction(model::decimal_add));
@@ -135,6 +136,7 @@ void Vm::entry_builtins() {
     model::based_str->attrs.insert("__eq__", new model::NativeFunction(model::str_eq));
     model::based_str->attrs.insert("__call__", new model::NativeFunction(model::str_call));
     model::based_str->attrs.insert("__bool__", new model::NativeFunction(model::str_bool));
+    model::based_str->attrs.insert("__hash__", new model::NativeFunction(model::str_hash));
     model::based_str->attrs.insert("contains", new model::NativeFunction(model::str_contains));
 
     model::based_error->attrs.insert("__call__", new model::NativeFunction([](model::Object* self, model::List* args) -> model::Object* {   assert( args->val.size() == 2);

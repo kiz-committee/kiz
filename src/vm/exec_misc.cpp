@@ -45,10 +45,61 @@ void Vm::exec_MAKE_LIST(const Instruction& instruction) {
 
     // 创建 List 对象，压入栈
     auto* list_obj = new model::List(elem_list);
-    list_obj->make_ref();  // List 自身引用计std::to_stringstd::to_string((数+1
+    list_obj->make_ref();  // List 自身引用计std::to_string
     op_stack.push(list_obj);
 
     DEBUG_OUTPUT("make_list: 打包 " + std::to_string(elem_count) + " 个元素为 List，压栈成功");
+}
+
+void Vm::exec_MAKE_DICT(const Instruction& instruction) {
+    DEBUG_OUTPUT("exec make_dict...");
+
+    size_t elem_count = instruction.opn_list[0];
+    const size_t total_elems = elem_count * 2;
+
+    // 校验：栈中元素个数 ≥ 要打包的个数
+    if (op_stack.size() < total_elems) {
+        assert(false && "Stack underflow in MAKE_DICT: insufficient elements");
+    }
+
+    // 栈中顺序是 [key1, val1, key2, val2,...]（栈底→栈顶）
+    std::vector<std::pair<
+        dep::BigInt, std::pair< model::Object*, model::Object* >
+    >> elem_list;
+    elem_list.reserve(elem_count);
+
+    for (size_t i = 0; i < elem_count; ++i) {
+        // 弹出 value（栈顶第一个是 value）
+        model::Object* value = op_stack.top();
+        op_stack.pop();
+        if (!value) {
+            throw std::runtime_error("Null value in dictionary entry");
+        }
+        value->make_ref(); // 增加引用计数
+
+        // 弹出 key（栈顶第二个是 key）
+        model::Object* key = fetch_one_from_stack_top();
+
+        key->make_ref(); // 增加引用计数
+
+        // 调用 __hash__ 方法获取哈希值
+        call(get_attr(key, "__hash__"), new model::List({}), key);
+        model::Object* hash_obj = fetch_one_from_stack_top();
+
+        // 检查哈希值类型
+        auto* hashed_int = dynamic_cast<model::Int*>(hash_obj);
+        if (!hashed_int) {
+            instruction_throw("TypeError", "__hash__ must return an integer");
+        }
+        assert(hashed_int != nullptr);
+
+        elem_list.emplace_back(hashed_int->val, std::pair{key, value});
+    }
+
+    // 创建字典对象
+    auto* dict_obj = new model::Dictionary(dep::Dict(elem_list));
+    dict_obj->make_ref();
+    op_stack.push(dict_obj);
 }
 
 void Vm::exec_TRY_START(const Instruction& instruction) {

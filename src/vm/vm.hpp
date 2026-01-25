@@ -131,6 +131,7 @@ private:
     static void exec_IS(const Instruction& instruction);
 
     static void exec_MAKE_LIST(const Instruction& instruction);
+    static void exec_MAKE_DICT(const Instruction& instruction);
     static void exec_CALL(const Instruction& instruction);
     static void exec_RET(const Instruction& instruction);
     static void exec_GET_ATTR(const Instruction& instruction);

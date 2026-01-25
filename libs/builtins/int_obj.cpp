@@ -223,4 +223,11 @@ Object* int_gt(Object* self, const List* args) {
     assert(false && "function Int.gt second arg need be Int or Decimal");
 };
 
+// Int.__hash__
+Object* int_hash(Object* self, const List* args) {
+    auto self_int = dynamic_cast<Int*>(self);
+    return new Int(self_int->val);
+}
+
+
 }  // namespace model

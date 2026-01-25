@@ -85,4 +85,12 @@ Object* str_contains(Object* self, const List* args) {
     return new Bool(exists);
 };
 
+// String.__hash__
+Object* str_hash(Object* self, const List* args) {
+    auto self_str = dynamic_cast<String*>(self);
+    assert(self_str != nullptr && "str_hash must be called by String object");
+    auto hashed_str = dep::hash_string(self_str->val);
+    return new Int(dep::BigInt(hashed_str));
+}
+
 }  // namespace model

@@ -267,31 +267,20 @@ void IRGenerator::gen_fn_call(CallExpr* call_expr) {
 }
 
 void IRGenerator::gen_dict(DictExpr* expr) {
-    // assert(expr && "gen_dict: 字典节点为空");
-    // // 处理字典键值对（生成值表达式IR）
-    // auto dict = new model::Dictionary();
-    // for (auto& [key, val_expr] : expr->init_list) {
-    //     gen_expr(val_expr.get());
-    //     // 弹出值存入字典（简化：假设栈顶为值，键为字符串常量）
-    //     size_t val_const_idx = curr_consts.size() - 1;
-    //     model::Object* val = curr_consts[val_const_idx];
-    //     val->make_ref();
-    //
-    //     // 键转换为String对象
-    //     auto key_obj = new model::String(key);
-    //     key_obj->make_ref();
-    //
-    //     // 存入字典
-    //     dict->attrs.insert(key, val);
-    // }
-    //
-    // // 将字典对象加入常量池并加载
-    // size_t dict_const_idx = get_or_add_const(curr_consts, dict);
-    // curr_code_list.emplace_back(
-    //     Opcode::LOAD_CONST,
-    //     std::vector<size_t>{dict_const_idx},
-    //     expr->pos
-    // );
+    assert(expr != nullptr);
+    // 处理字典键值对
+    for (auto& [key, val_expr] : expr->elements) {
+        gen_expr(key.get());
+        gen_expr(val_expr.get());
+    }
+
+    // 将字典对象加入常量池并加载
+    size_t dict_size = expr->elements.size();
+    curr_code_list.emplace_back(
+        Opcode::MAKE_DICT,
+        std::vector{dict_size},
+        expr->pos
+    );
 }
 
 }
