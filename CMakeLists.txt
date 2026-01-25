@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(kiz
-        VERSION 0.2.1
+        VERSION 0.4.0
         LANGUAGES CXX)
 
 # ===================== 基础配置 =====================
@@ -12,7 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # 版本号定义
 set(KIZ_VERSION_MAJOR 0)
-set(KIZ_VERSION_MINOR 3)
+set(KIZ_VERSION_MINOR 4)
 set(KIZ_VERSION_PATCH 0)
 set(KIZ_VERSION "${KIZ_VERSION_MAJOR}.${KIZ_VERSION_MINOR}.${KIZ_VERSION_PATCH}")
 
