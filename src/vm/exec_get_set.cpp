@@ -20,7 +20,9 @@ model::Object* Vm::get_attr(const model::Object* obj, const std::string& attr_na
         return get_attr(parent_it->value, attr_name);
     }
     
-    throw NativeFuncError("NameError", "Undefined attribute '"+attr_name+"'");
+    throw NativeFuncError("NameError",
+        "Undefined attribute '" + attr_name + "'" + " of " + obj->to_string()
+    );
 }
 
 // -------------------------- 变量操作 --------------------------

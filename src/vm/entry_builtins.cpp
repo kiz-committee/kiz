@@ -144,6 +144,6 @@ void Vm::entry_builtins() {
     builtins.insert("__Nil", model::based_nil);
     builtins.insert("Error", model::based_error);
     builtins.insert("Module", model::based_module);
-    DEBUG_OUTPUT("current builtins: " + builtins.to_string());
+    std::cout << "current builtins: " + builtins.to_string();
 }
 }
