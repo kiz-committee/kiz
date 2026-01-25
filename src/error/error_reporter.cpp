@@ -36,7 +36,10 @@ void context_printer(
     size_t src_col_end = pos.col_end;
 
     // 获取错误行代码
-    DEBUG_OUTPUT("getting line");
+    DEBUG_OUTPUT("getting line. Additional, in context_printer, reporting an error. Pos: line " << pos.lno_start
+        << "~" << pos.lno_end << ", col "
+        << pos.col_start << "~" << pos.col_end << ". src_path: " << src_path);
+
     std::string error_line = SrcManager::get_slice(src_path, src_line_start, src_line_end);
     DEBUG_OUTPUT(error_line);
     // 只有当切片范围无效时才显示错误信息，空行是有效的

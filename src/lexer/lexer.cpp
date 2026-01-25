@@ -59,12 +59,14 @@ std::vector<Token> Lexer::tokenize(const std::string& src, size_t lineno_start) 
     size_t col = 1;
     register_keywords();
     DEBUG_OUTPUT("tokenize the src txt...");
+    DEBUG_OUTPUT("txt: " << src);
     while (pos < src.size()) {
         if (src[pos] == '\n') {
-            if ( !tokens.empty() ) {
-                if (tokens.back().type == TokenType::Backslash) {
-                    tokens.pop_back();
-                }
+            // 检查是否有续行符
+            if (!tokens.empty() && tokens.back().type == TokenType::Backslash) {
+                // 有续行符: 移除反斜杠, 不添加EndOfLine
+                tokens.pop_back();
+            } else { // 无续行符: 添加EndOfLine
                 tokens.emplace_back(TokenType::EndOfLine, "\n", lineno, col);
             }
             ++lineno;

@@ -291,22 +291,31 @@ void Vm::load_required_modules(const dep::HashMap<model::Module*>& modules) {
     loaded_modules = modules;
 }
 
-auto Vm::gen_pos_info() -> std::vector<std::pair<std::string, err::PositionInfo>> {
-    size_t i = 0;
-    std::vector<std::pair<std::string, err::PositionInfo>> positions;
+using StackTrace = std::vector<std::pair<std::string, err::PositionInfo>>;
+StackTrace Vm::gen_pos_info() {
+    size_t frame_index = 0;
+    StackTrace positions;
     std::string path;
     for (const auto& frame: call_stack) {
-        if (const auto m = dynamic_cast<model::Module*>(frame->owner)) {
+        auto modular_frame_owner = dynamic_cast<model::Module*>(frame->owner);
+        if (const auto m = modular_frame_owner) {
             path = m->name;
         }
         err::PositionInfo pos {};
-        if (i == call_stack.size() - 1) {
+        bool cond = frame_index == call_stack.size() - 1;
+        DEBUG_OUTPUT("frame_index: " << frame_index << ", call_stack.size(): " << call_stack.size());
+        if (cond) {
             pos = frame->code_object->code.at(frame->pc).pos;
         } else {
             pos = frame->code_object->code.at(frame->pc - 1).pos;
         }
+        DEBUG_OUTPUT(
+            "Vm::gen_pos_info, pos = col "
+            << pos.col_start << ", " << pos.col_end << " | line "
+            << pos.lno_start << ", " << pos.lno_end
+        );
         positions.emplace_back(path, pos);
-        ++i;
+        ++frame_index;
     }
     return positions;
 }

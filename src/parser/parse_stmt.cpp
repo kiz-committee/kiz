@@ -299,7 +299,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         }
         // 非成员访问表达式后不能跟 =
         err::error_reporter(this -> file_path, curr_token().pos, "SyntaxError",
-            "invalid assignment target: expected member access");
+            "Invalid assignment target: expected member access");
     }
 
     if (expr != nullptr) {

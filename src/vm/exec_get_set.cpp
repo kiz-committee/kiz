@@ -65,7 +65,10 @@ void Vm::exec_LOAD_VAR(const Instruction& instruction) {
                 return;
             }
         }
-        else instruction_throw("NameError", "Undefined variable '"+var_name+"'");
+        else {
+            DEBUG_OUTPUT("var_name = " << var_name << ", not found, throwing error with instruction_throw");
+            instruction_throw("NameError", "Undefined variable '"+var_name+"'");
+        }
     }
 
     model::Object* var_val = var_it->value;
