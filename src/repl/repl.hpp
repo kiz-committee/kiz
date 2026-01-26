@@ -19,19 +19,26 @@
 #include "../lexer/lexer.hpp"
 #include "../parser/parser.hpp"
 #include "../vm/vm.hpp"
+#include "../input_helper/repl_input_helper.hpp"
+#include "util/src_manager.hpp"
 
 namespace ui {
 
 class Repl {
     static const std::string file_path;
     std::vector<std::string> cmd_history_;
+    size_t multiline_start_;
     bool is_running_;
 
     kiz::Vm vm_;
 
-    void add_to_history(const std::string& cmd) {
-        cmd_history_.emplace_back(cmd);
+
+
+    [[nodiscard]] size_t get_actual_lno() const {
+        DEBUG_OUTPUT("Getting actual_lno, original multiline_start_: " << multiline_start_);
+        return multiline_start_;
     }
+
 
     [[nodiscard]] static std::string trim(const std::string& str) {
         const auto left = std::find_if_not(str.begin(), str.end(), [](unsigned char c) {
@@ -51,7 +58,8 @@ public:
     std::string read(const std::string& prompt);
     void loop();
 
-    void eval_and_print(const std::string& cmd);
+    void eval_and_print(const std::string& cmd, size_t startline);
+    void process_command(const std::string& cmd);
 
     void stop() { is_running_ = false; }
 

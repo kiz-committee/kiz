@@ -17,11 +17,13 @@
 namespace fs = std::filesystem;
 
 namespace err {
-
+    std::vector<std::string> slice_file_content(std::string filecon);
 class SrcManager {
 public:
     // key: 文件路径, value: 文件内容
     static std::unordered_map<std::string, std::string> opened_files;
+
+    static bool is_valid_file_range(const int &src_line_start, const int &src_line_end, size_t total_lines);
 
     // 获取切片
     static std::string get_slice(const std::string& src_path, const int& src_line_start, const int& src_line_end);

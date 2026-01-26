@@ -53,6 +53,7 @@ set(SRC_FILES
         ${PROJECT_SOURCE_DIR}/src/error/error_reporter.cpp
         ${PROJECT_SOURCE_DIR}/src/util/src_manager.cpp
         ${PROJECT_SOURCE_DIR}/src/repl/repl.cpp
+        ${PROJECT_SOURCE_DIR}/src/input_helper/repl_input_helper.cpp
         ${PROJECT_SOURCE_DIR}/libs/builtins/decimal_obj.cpp
 )
 
@@ -71,13 +72,13 @@ set(LIB_SRC_FILES
 # ===================== 文件存在性检查（仅检查cpp） =====================
 foreach(src_file ${SRC_FILES})
     if(NOT EXISTS ${src_file})
-        message(FATAL_ERROR "【错误】未找到src目录文件：${src_file}，请检查路径/文件名是否正确！")
+        message(FATAL_ERROR "[错误] 未找到src目录文件：${src_file}，请检查路径/文件名是否正确！")
     endif()
 endforeach()
 
 foreach(lib_file ${LIB_SRC_FILES})
     if(NOT EXISTS ${lib_file})
-        message(FATAL_ERROR "【错误】未找到库文件：${lib_file}，请检查路径/文件名是否正确！")
+        message(FATAL_ERROR "[错误] 未找到库文件：${lib_file}，请检查路径/文件名是否正确！")
     endif()
 endforeach()
 
@@ -85,7 +86,7 @@ endforeach()
 set(ALL_SRC_FILES ${SRC_FILES} ${LIB_SRC_FILES})
 
 # ===================== 编译配置（核心：让编译器找到hpp） =====================
-# 仅添加cpp到可执行目标（完全符合你的需求）
+# 仅添加cpp到可执行目标
 add_executable(kiz ${ALL_SRC_FILES})
 
 # 关键：指定头文件搜索路径 → 编译器会在这些路径下自动找#include的hpp

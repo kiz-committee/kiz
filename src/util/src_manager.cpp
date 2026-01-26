@@ -20,9 +20,48 @@
 
 #include "../kiz.hpp"
 
-namespace err {
 
-std::unordered_map<std::string, std::string> SrcManager::opened_files {};
+namespace err {
+/**
+ * @brief 正确切分文件内容并去掉可能的\r
+ * @param filecon 形如<content_1>\n<content_2>\n....<content_n>\n的一串字符串，以正确分割
+ * @result 返回正确切分的内容
+ */
+std::vector<std::string> slice_file_content(std::string filecon) {
+    std::vector<std::string> sliced_content;
+    std::string nowline;
+    for (const auto& charact: filecon) {
+        if (charact == '\n') {
+            sliced_content.emplace_back(nowline);
+            nowline = "";
+        }
+        else
+            nowline += charact;
+    }
+    // 清除 \r
+    std::vector<std::string> result;
+    for (const auto& line: sliced_content) {
+        if (line.ends_with("\r")) {
+            result.emplace_back(line.substr(0, line.length() - 1));
+        } else {
+            result.emplace_back(line);
+        }
+    }
+    return result;
+}
+
+std::unordered_map<std::string, std::string> SrcManager::opened_files;
+
+bool SrcManager::is_valid_file_range(
+    const int &src_line_start,
+    const int &src_line_end,
+    const size_t total_lines
+) {
+    return src_line_start >= 1
+        && src_line_end >= 1
+        && src_line_start <= src_line_end
+        && static_cast<size_t>(src_line_end) <= total_lines;
+}
 
 /**
  * @brief 从指定文件中提取指定行范围的内容（行号从1开始）
@@ -35,31 +74,55 @@ std::string SrcManager::get_slice(const std::string& src_path, const int& src_li
     DEBUG_OUTPUT("get slice");
     // 先获取完整文件内容（依赖缓存机制）
     std::string file_content = get_file_by_path(src_path);
-    DEBUG_OUTPUT("file_content is:" + file_content + "\n");
+    DEBUG_OUTPUT("file_content is:" + file_content);
 
-    DEBUG_OUTPUT("try to slice");
+    DEBUG_OUTPUT("try to slice [" << src_line_start << " - " << src_line_end << "]");
     // 按行分割文件内容（兼容 Windows \r\n 和 Linux \n 换行符）
-    std::vector<std::string> lines;
     std::stringstream content_stream(file_content);
     std::string line;
-    while (std::getline(content_stream, line)) {
+
+    // 使get_slice能读到没有换行符结尾的串
+    file_content += "\n";
+    DEBUG_OUTPUT("Added trailing newline to file content");
+
+    std::string repr_file_content;
+    for (const auto charact: file_content) {
+        if (charact == '\n') {
+            repr_file_content += "\\n";
+        } else {
+            repr_file_content += charact;
+        }
+    }
+    DEBUG_OUTPUT("repr_file_content: " + repr_file_content);
+
+    /*while (std::getline(content_stream, line)) {
         // 移除 Windows 换行符残留的 \r（std::getline 会自动去掉 \n，但不会处理 \r）
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
         lines.emplace_back(std::move(line));
+    }*/
+    std::vector<std::string> lines = slice_file_content(file_content);
+
+    int sumline = 0;
+    for (const std::string& k : lines) {
+
+        if (k == "") DEBUG_OUTPUT("k is empty");
+        else if (k == "\n") DEBUG_OUTPUT("k is \\n");
+        else DEBUG_OUTPUT("k is normal: " << k);
+        sumline ++;
     }
+    DEBUG_OUTPUT("Finally, got " << sumline << " lines");
+
 
     // 校验行号范围有效性（行号从1开始，且起始行 ≤ 结束行）
     const size_t total_lines = lines.size();
-    if (src_line_start < 1 || src_line_end < 1 || 
-        src_line_start > src_line_end || 
-        static_cast<size_t>(src_line_end) > total_lines
-    ) {
-        // std::cerr << "[Warning] Invalid line range: start=" << src_line_start
-        //          << ", end=" << src_line_end << " (total lines: " << total_lines << ")\n";
+    DEBUG_OUTPUT("There is/are " << static_cast<int>(total_lines) << " line(s)");
+    if (!is_valid_file_range(src_line_start, src_line_end, total_lines)) {
+        DEBUG_OUTPUT( "[Warning] Invalid line range: start=" << src_line_start
+                  << ", end=" << src_line_end << " (total lines: " << total_lines << ")\n");
         return "";
-    }
+    } else DEBUG_OUTPUT("Valid line range");
 
     // 提取目标行范围（转换为0-based索引）
     std::stringstream slice_stream;

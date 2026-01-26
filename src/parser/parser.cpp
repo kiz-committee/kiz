@@ -42,7 +42,8 @@ Token Parser::skip_token(const std::string& want_skip) {
     }
 
     // 严格报错
-    assert(false);
+    // Original: assert(false);
+    err::error_reporter(this -> file_path, curr_token().pos, "SyntaxError", "Invalid token/grammar");
 }
 
 // curr_token实现

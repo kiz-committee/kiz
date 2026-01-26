@@ -25,7 +25,9 @@ std::unique_ptr<BlockStmt> Parser::parse_block(TokenType endswith) {
         }
 
         if (curr_tok.type == TokenType::EndOfFile) {
-            assert(false && "Block not terminated with 'end'");
+            // Original: assert(false && "Block not terminated with 'end'");
+            // Now:
+            err::error_reporter(this -> file_path, curr_token().pos, "ParsingError", "Block not terminated with 'end'");
         }
 
         if (auto stmt = parse_stmt()) {
@@ -41,7 +43,14 @@ std::unique_ptr<IfStmt> Parser::parse_if() {
     DEBUG_OUTPUT("parsing if");
     // 解析if条件表达式
     auto cond_expr = parse_expression();
-    assert(cond_expr!=nullptr && "Invalid if condition");
+    // Original: assert(cond_expr!=nullptr && "Invalid if condition");
+    // Now:
+    if (cond_expr == nullptr)
+        err::error_reporter(this -> file_path,
+            curr_token().pos,
+            "SyntaxError",
+            "Invalid if condition"
+        );
 
     // 解析if体（无end的块）
     skip_start_of_block();
@@ -88,7 +97,8 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         auto tok = skip_token("while");
         // 解析循环条件表达式
         auto cond_expr = parse_expression();
-        assert(cond_expr != nullptr);
+        if (cond_expr == nullptr)
+            err::error_reporter(this -> file_path, curr_token().pos, "SyntaxError", "Invalid if condition");
         skip_start_of_block();
         auto while_block = parse_block();
         skip_token("end");
@@ -112,7 +122,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
                 if (curr_token().type == TokenType::Comma) {
                     skip_token(",");
                 } else if (curr_token().type != TokenType::RParen) {
-                    assert(false && "Mismatched function parameters");
+                    err::error_reporter(this -> file_path, curr_token().pos, "SyntaxError", "Mismatched function parameters");
                 }
             }
             skip_token(")");  // 跳过右括号
@@ -238,7 +248,9 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         
         skip_start_of_block();
         auto try_block = parse_block(TokenType::Catch);
-        assert(curr_token().type == TokenType::Catch);
+        if (curr_token().type != TokenType::Catch)
+            err::error_reporter(this -> file_path, curr_token().pos, "SyntaxError",
+            "Found try block without catch block");
 
         std::vector<std::unique_ptr<CatchStmt>> catch_blocks;
         auto block_tok = curr_token();
@@ -256,7 +268,10 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         }
 
         skip_token("end");
-        assert(!catch_blocks.empty());
+        if (catch_blocks.empty()) {
+            err::error_reporter(this -> file_path, curr_token().pos, "SyntaxError",
+                "Nothing in catch block");
+        }
 
         return std::make_unique<TryStmt>(tok.pos, std::move(try_block), std::move(catch_blocks));
     }
@@ -297,7 +312,8 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             return set_item;
         }
         // 非成员访问表达式后不能跟 =
-        assert("invalid assignment target: expected member access");
+        err::error_reporter(this -> file_path, curr_token().pos, "SyntaxError",
+            "Invalid assignment target: expected member access");
     }
 
     if (expr != nullptr) {
