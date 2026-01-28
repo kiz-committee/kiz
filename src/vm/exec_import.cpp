@@ -244,10 +244,9 @@ void Vm::exec_IMPORT(const Instruction& instruction) {
             assert(module_name_str != nullptr);
             module_name = module_name_str->val;
         }
-        auto mod_attr_obj = local_object;
         // mod_attr_obj->attrs.insert("__owner_module__", module_obj);
-
-        module_obj->attrs.insert(name, mod_attr_obj);
+        local_object->make_ref();
+        module_obj->attrs.insert(name, local_object);
     }
 
     call_stack.pop_back();
