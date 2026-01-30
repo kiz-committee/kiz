@@ -27,9 +27,7 @@ Repl::Repl(): is_running_(true), multiline_start_(1), vm_(file_path) {
 std::string Repl::read(const std::string& prompt) {
     std::cout << Color::BRIGHT_MAGENTA << prompt << Color::RESET;
     std::cout.flush();
-    // std::string result = get_whole_input(&std::cin, &std::cout);
-    std::string result;
-    getline(std::cin, result);
+    std::string result = ui::get_whole_input(&std::cin, &std::cout);
     return result;
 }
 
@@ -37,7 +35,7 @@ void Repl::loop() {
     DEBUG_OUTPUT("start repl loop");
     while (is_running_) {
         try {
-            auto code = read(">>>"); // code 可能为多行
+            auto code = read(">>> "); // code 可能为多行
             DEBUG_OUTPUT("loop got input: " << code);
             auto old_code_iterator = err::SrcManager::opened_files.find(file_path);
             if (old_code_iterator != nullptr) {
