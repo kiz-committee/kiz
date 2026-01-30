@@ -408,7 +408,7 @@ void IRGenerator::gen_try(TryStmt* try_stmt) {
 
     size_t try_start_idx = curr_code_list.size();
     curr_code_list.emplace_back(
-        Opcode::TRY_START,
+        Opcode::ENTER_TRY,
         std::vector<size_t>{0},  // 占位
         try_stmt->pos
     );
@@ -417,7 +417,7 @@ void IRGenerator::gen_try(TryStmt* try_stmt) {
 
     size_t try_end_idx = curr_code_list.size();
     curr_code_list.emplace_back(
-        Opcode::TRY_END,
+        Opcode::START_CATCH,
         std::vector<size_t>{0},  // 占位
         try_stmt->pos
     );

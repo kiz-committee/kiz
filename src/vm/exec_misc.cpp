@@ -117,7 +117,7 @@ void Vm::exec_TRY_END(const Instruction& instruction) {
 }
 
 void Vm::exec_LOAD_ERROR(const Instruction& instruction) {
-    DEBUG_OUTPUT("loading curr error" + curr_error->to_string());
+    DEBUG_OUTPUT("loading curr error" + curr_error->debug_string());
     op_stack.emplace(curr_error);
 }
 

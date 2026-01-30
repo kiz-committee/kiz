@@ -75,7 +75,7 @@ void Vm::exec_LOAD_VAR(const Instruction& instruction) {
     }
 
     model::Object* var_val = var_it->value;
-    DEBUG_OUTPUT("load var: " + var_name + " = " + var_val->to_string());
+    DEBUG_OUTPUT("load var: " + var_name + " = " + var_val->debug_string());
     var_val->make_ref();
     op_stack.push(var_val);
     DEBUG_OUTPUT("ok to exec load_var...");
@@ -92,7 +92,7 @@ void Vm::exec_LOAD_CONST(const Instruction& instruction) {
         assert(false && "LOAD_CONST: 常量索引超出范围");
     }
     model::Object* const_val = frame->code_object->consts[const_idx];
-    DEBUG_OUTPUT("ok to get load const [" + std::to_string(const_idx) + "]: "+ const_val->to_string());
+    DEBUG_OUTPUT("ok to get load const [" + std::to_string(const_idx) + "]: "+ const_val->debug_string());
     const_val->make_ref();
     op_stack.push(const_val);
 }
@@ -134,7 +134,7 @@ void Vm::exec_SET_LOCAL(const Instruction& instruction) {
     model::Object* var_val = op_stack.top();
     op_stack.pop();
     var_val->make_ref();
-    DEBUG_OUTPUT("var val: " + var_val->to_string());
+    DEBUG_OUTPUT("var val: " + var_val->debug_string());
 
     auto var_it = curr_frame->locals.find(var_name);
 
@@ -191,10 +191,10 @@ void Vm::exec_GET_ATTR(const Instruction& instruction) {
     }
     std::string attr_name = curr_frame->code_object->names[name_idx];
     DEBUG_OUTPUT("attr name: " + attr_name);
-    DEBUG_OUTPUT("obj: " + obj->to_string());
+    DEBUG_OUTPUT("obj: " + obj->debug_string());
 
     model::Object* attr_val = get_attr(obj, attr_name);
-    DEBUG_OUTPUT("attr val: " + attr_val->to_string());
+    DEBUG_OUTPUT("attr val: " + attr_val->debug_string());
     op_stack.push(attr_val);
 }
 

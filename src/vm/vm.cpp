@@ -94,7 +94,7 @@ void Vm::exec_curr_code() {
             instruction_throw(e.name, e.msg);
         }
         DEBUG_OUTPUT("curr inst is "+opcode_to_string(curr_inst.opc));
-        DEBUG_OUTPUT("current stack top : " + (op_stack.empty() ? "[Nothing]" : op_stack.top()->to_string()));
+        DEBUG_OUTPUT("current stack top : " + (op_stack.empty() ? "[Nothing]" : op_stack.top()->debug_string()));
 
         // 修正PC自增条件：仅非跳转/非RET指令自增
         if (curr_inst.opc != Opcode::JUMP && curr_inst.opc != Opcode::JUMP_IF_FALSE && curr_inst.opc != Opcode::RET) {
@@ -289,8 +289,8 @@ void Vm::execute_instruction(const Instruction& instruction) {
         case Opcode::LOAD_CONST:      exec_LOAD_CONST(instruction);    break;
         case Opcode::SET_GLOBAL:      exec_SET_GLOBAL(instruction);    break;
         case Opcode::SET_LOCAL:       exec_SET_LOCAL(instruction);     break;
-        case Opcode::TRY_START:       exec_TRY_START(instruction);     break;
-        case Opcode::TRY_END:         exec_TRY_END(instruction);       break;
+        case Opcode::ENTER_TRY:       exec_TRY_START(instruction);     break;
+        case Opcode::START_CATCH:         exec_TRY_END(instruction);       break;
         case Opcode::IMPORT:          exec_IMPORT(instruction);        break;
         case Opcode::LOAD_ERROR:      exec_LOAD_ERROR(instruction);    break;
         case Opcode::SET_NONLOCAL:    exec_SET_NONLOCAL(instruction);  break;

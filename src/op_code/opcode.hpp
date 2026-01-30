@@ -5,11 +5,12 @@
  * @date 2025-10-25
  */
 #pragma once
+#include <cstdint>
 #include <string>
 
 namespace kiz {
 
-enum class Opcode {
+enum class Opcode : uint8_t {
     OP_ADD, OP_SUB, OP_MUL, OP_DIV,
     OP_MOD, OP_POW, OP_NEG,
     OP_EQ, OP_GT, OP_LT,
@@ -26,7 +27,7 @@ enum class Opcode {
 
     JUMP, JUMP_IF_FALSE, THROW, 
     MAKE_LIST, MAKE_DICT,
-    IMPORT, TRY_START, TRY_END, LOAD_ERROR,
+    IMPORT, ENTER_TRY, EXIT_TRY, START_CATCH, LOAD_ERROR,
 
     IS_INSTANCE, CREATE_OBJECT,
     STOP
@@ -85,8 +86,9 @@ inline std::string opcode_to_string(Opcode opc) {
 
         // 其他
         case Opcode::IMPORT:      return "IMPORT";
-        case Opcode::TRY_START:   return "TRY_START";
-        case Opcode::TRY_END:     return "TRY_END";
+        case Opcode::ENTER_TRY:   return "ENTER_TRY";
+        case Opcode::START_CATCH:    return "START_CATCH";
+        case Opcode::EXIT_TRY: return "EXIT_TRY";
         case Opcode::LOAD_ERROR:  return "LOAD_ERROR";
         case Opcode::IS_INSTANCE: return "IS_INSTANCE";
         case Opcode::CREATE_OBJECT: return "CREATE_OBJECT";

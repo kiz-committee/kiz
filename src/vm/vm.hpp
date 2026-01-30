@@ -30,7 +30,7 @@ class Object;
 
 namespace kiz {
 
-enum class Opcode;
+enum class Opcode : uint8_t;
 
 struct Instruction {
     Opcode opc;

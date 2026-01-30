@@ -53,7 +53,7 @@ set(SRC_FILES
         ${PROJECT_SOURCE_DIR}/src/error/error_reporter.cpp
         ${PROJECT_SOURCE_DIR}/src/util/src_manager.cpp
         ${PROJECT_SOURCE_DIR}/src/repl/repl.cpp
-        ${PROJECT_SOURCE_DIR}/src/repl/repl_input_helper.cpp
+        ${PROJECT_SOURCE_DIR}/src/repl/repl_readline.cpp
 )
 
 # lib 模块（仅列cpp）

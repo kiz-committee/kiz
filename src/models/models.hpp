@@ -380,4 +380,42 @@ public:
     }
 };
 
+inline auto create_int(dep::BigInt n) {
+    auto o = new Int(std::move(n));
+    return o;
+}
+
+inline auto create_str(std::string n) {
+    auto o = new String(std::move(n));
+    return o;
+}
+
+inline auto create_decimal(dep::Decimal n) {
+    auto o = new Decimal(std::move(n));
+    return o;
+}
+
+inline auto create_list(std::vector<Object*> n) {
+    auto o = new List(std::move(n));
+    return o;
+}
+
+inline auto cast_to_int(Object* o) {
+    auto obj = dynamic_cast<Int*>(o);
+    assert(obj != nullptr);
+    return obj;
+}
+
+inline auto cast_to_str(Object* o) {
+    auto obj = dynamic_cast<String*>(o);
+    assert(obj != nullptr);
+    return obj;
+}
+
+inline auto cast_to_bool(Object* o) {
+    auto obj = dynamic_cast<Bool*>(o);
+    assert(obj != nullptr);
+    return obj;
+}
+
 };

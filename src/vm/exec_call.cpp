@@ -36,9 +36,9 @@ void Vm::handle_call(model::Object* func_obj, model::Object* args_obj, model::Ob
         // -------------------------- 处理 NativeFunction 调用 --------------------------
         DEBUG_OUTPUT("start to call NativeFunction");
         DEBUG_OUTPUT("call NativeFunction"
-            + cpp_func->to_string()
-            + "(self=" + (self ? self->to_string() : "nullptr")
-            + ", "+ args_obj->to_string() + ")"
+            + cpp_func->debug_string()
+            + "(self=" + (self ? self->debug_string() : "nullptr")
+            + ", "+ args_obj->debug_string() + ")"
             );
 
         model::Object* return_val = cpp_func->func(self, args_list);
@@ -58,7 +58,7 @@ void Vm::handle_call(model::Object* func_obj, model::Object* args_obj, model::Ob
         op_stack.push(return_val);
 
         DEBUG_OUTPUT("ok to call NativeFunction...");
-        DEBUG_OUTPUT("NativeFunction return: " + return_val->to_string());
+        DEBUG_OUTPUT("NativeFunction return: " + return_val->debug_string());
     } else if (auto* func = dynamic_cast<model::Function*>(func_obj)) {
         // -------------------------- 处理 Function 调用 --------------------------
         DEBUG_OUTPUT("call Function: " + func->name);
@@ -196,8 +196,8 @@ void Vm::exec_CALL(const Instruction& instruction) {
     model::Object* args_obj = op_stack.top();
     op_stack.pop();
 
-    DEBUG_OUTPUT("弹出函数对象: " + func_obj->to_string());
-    DEBUG_OUTPUT("弹出参数列表: " + args_obj->to_string());
+    DEBUG_OUTPUT("弹出函数对象: " + func_obj->debug_string());
+    DEBUG_OUTPUT("弹出参数列表: " + args_obj->debug_string());
     handle_call(func_obj, args_obj);
 
 }
@@ -214,8 +214,8 @@ void Vm::exec_CALL_METHOD(const Instruction& instruction) {
     model::Object* args_obj = op_stack.top();
     op_stack.pop();
 
-    DEBUG_OUTPUT("弹出对象: " + obj->to_string());
-    DEBUG_OUTPUT("弹出参数列表: " + args_obj->to_string());
+    DEBUG_OUTPUT("弹出对象: " + obj->debug_string());
+    DEBUG_OUTPUT("弹出参数列表: " + args_obj->debug_string());
 
     size_t name_idx = instruction.opn_list[0];
     CallFrame* curr_frame = call_stack.back().get();
@@ -228,7 +228,7 @@ void Vm::exec_CALL_METHOD(const Instruction& instruction) {
     auto func_obj = get_attr(obj, attr_name);
     func_obj->make_ref();
 
-    DEBUG_OUTPUT("获取函数对象: " + func_obj->to_string());
+    DEBUG_OUTPUT("获取函数对象: " + func_obj->debug_string());
     handle_call(func_obj, args_obj, obj);
 
 }

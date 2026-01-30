@@ -26,7 +26,7 @@ auto Vm::fetch_two_from_stack_top(
 void Vm::exec_ADD(const Instruction& instruction) {
     DEBUG_OUTPUT("exec add...");
     auto [a, b] = fetch_two_from_stack_top("add");
-    DEBUG_OUTPUT("a is " + a->to_string() + ", b is " + b->to_string());
+    DEBUG_OUTPUT("a is " + a->debug_string() + ", b is " + b->debug_string());
 
     handle_call(get_attr(a, "__add__"), new model::List({b}), a);
     DEBUG_OUTPUT("success to call function");
