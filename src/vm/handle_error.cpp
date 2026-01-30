@@ -1,3 +1,5 @@
+#include <ranges>
+
 #include "vm.hpp"
 #include "builtins/include/builtin_functions.hpp"
 
@@ -70,7 +72,8 @@ void Vm::handle_throw() {
         if (!frame->try_blocks.empty()) {
             target_frame = frame;
             catch_pc = frame->try_blocks.back().catch_start;
-            frame->try_blocks.back().can_handle_error = true;
+            assert(catch_pc != 0);
+            std::cout << "find catch pc!" << catch_pc << std::endl;
             break;
         }
         frames_to_pop++;
@@ -112,30 +115,13 @@ void Vm::handle_throw() {
 void Vm::exec_ENTER_TRY(const Instruction& instruction) {
     assert(!call_stack.empty() && "exec_ENTER_TRY: 调用栈为空，无法执行ENTER_TRY指令");
     size_t catch_start = instruction.opn_list[0];
-    call_stack.back()->try_blocks.emplace_back(todo);
+    size_t finally_start = instruction.opn_list[1];
+    call_stack.back()->try_blocks.emplace_back(catch_start, finally_start);
 }
 
-void Vm::exec_START_CATCH(const Instruction& instruction) {
+void Vm::exec_POP_TRY_FRAME(const Instruction& instruction) {
     assert(!call_stack.empty());
-    assert(!call_stack.back()->try_blocks.empty());
-
-    const size_t finally_start_pc = instruction.opn_list[0];
-    call_stack.back()->pc = finally_start_pc;
-}
-
-void Vm::exec_EXIT_TRY(const Instruction& instruction) {
-    assert(!call_stack.empty());
-    assert(!call_stack.back()->try_blocks.empty());
-
-    bool can_handle_error = call_stack.back()->try_blocks.back().can_handle_error;
     call_stack.back()->try_blocks.pop_back();
-    const size_t exit_pc = instruction.opn_list[0];
-
-    if (can_handle_error) {
-        call_stack.back()->pc = exit_pc;
-    } else {
-        call_stack.back()->pc ++;
-    }
 }
 
 

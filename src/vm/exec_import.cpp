@@ -234,8 +234,7 @@ void Vm::exec_IMPORT(const Instruction& instruction) {
         }
 
         if (curr_inst.opc != Opcode::JUMP && curr_inst.opc != Opcode::JUMP_IF_FALSE &&
-            curr_inst.opc != Opcode::RET && curr_inst.opc != Opcode::START_CATCH &&
-            curr_inst.opc != Opcode::EXIT_TRY) {
+            curr_inst.opc != Opcode::RET) {
             curr_frame.pc++;
         }
 

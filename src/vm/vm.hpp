@@ -140,14 +140,13 @@ private:
     static void exec_SET_NONLOCAL(const Instruction& instruction);
 
     static void exec_ENTER_TRY(const Instruction& instruction);
-    static void exec_START_CATCH(const Instruction& instruction);
-    static void exec_EXIT_TRY(const Instruction& instruction);
-    static void exec_IMPORT(const Instruction& instruction);
+    static void exec_POP_TRY_FRAME(const Instruction& instruction);
     static void exec_LOAD_ERROR(const Instruction& instruction);
+    static void exec_THROW(const Instruction& instruction);
+    static void exec_IMPORT(const Instruction& instruction);
 
     static void exec_JUMP(const Instruction& instruction);
     static void exec_JUMP_IF_FALSE(const Instruction& instruction);
-    static void exec_THROW(const Instruction& instruction);
     static void exec_IS_INSTANCE(const Instruction& instruction);
     static void exec_CREATE_OBJECT(const Instruction& instruction);
     static void exec_STOP(const Instruction& instruction);

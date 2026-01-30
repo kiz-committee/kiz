@@ -97,8 +97,7 @@ void Vm::exec_curr_code() {
         DEBUG_OUTPUT("current stack top : " + (op_stack.empty() ? "[Nothing]" : op_stack.top()->debug_string()));
 
         if (curr_inst.opc != Opcode::JUMP && curr_inst.opc != Opcode::JUMP_IF_FALSE &&
-            curr_inst.opc != Opcode::RET && curr_inst.opc != Opcode::START_CATCH &&
-            curr_inst.opc != Opcode::EXIT_TRY) {
+            curr_inst.opc != Opcode::RET) {
             curr_frame.pc++;
             }
     }
@@ -182,8 +181,7 @@ void Vm::execute_instruction(const Instruction& instruction) {
         case Opcode::SET_LOCAL:       exec_SET_LOCAL(instruction);     break;
 
         case Opcode::ENTER_TRY:       exec_ENTER_TRY(instruction);     break;
-        case Opcode::START_CATCH:     exec_START_CATCH(instruction);   break;
-        case Opcode::EXIT_TRY:        exec_EXIT_TRY(instruction);      break;
+        case Opcode::POP_TRY_FRAME:   exec_POP_TRY_FRAME(instruction); break;
 
         case Opcode::IMPORT:          exec_IMPORT(instruction);        break;
         case Opcode::LOAD_ERROR:      exec_LOAD_ERROR(instruction);    break;

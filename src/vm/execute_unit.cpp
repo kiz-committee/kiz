@@ -76,9 +76,7 @@ void execute_unit(const Instruction& instruction) {
 
     case Opcode::ENTER_TRY:
 
-    case Opcode::START_CATCH:
-
-    case Opcode::EXIT_TRY:
+    case Opcode::POP_TRY_FRAME:
 
     case Opcode::THROW:
 

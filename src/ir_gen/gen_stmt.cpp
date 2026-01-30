@@ -409,7 +409,7 @@ void IRGenerator::gen_try(TryStmt* try_stmt) {
     size_t try_start_idx = curr_code_list.size();
     curr_code_list.emplace_back(
         Opcode::ENTER_TRY,
-        std::vector<size_t>{0},  // 占位
+        std::vector<size_t>{0, 0},  // 占位[catch_start, finally_start]
         try_stmt->pos
     );
 
@@ -417,7 +417,7 @@ void IRGenerator::gen_try(TryStmt* try_stmt) {
 
     size_t try_end_idx = curr_code_list.size();
     curr_code_list.emplace_back(
-        Opcode::START_CATCH,
+        Opcode::JUMP,
         std::vector<size_t>{0},  // 占位
         try_stmt->pos
     );
@@ -458,32 +458,29 @@ void IRGenerator::gen_try(TryStmt* try_stmt) {
         curr_code_list[curr_jump_if_false_idx].opn_list[0] = end_catch_idx;
     }
 
-    // finally
-    size_t finally_start_idx = curr_code_list.size();
-    if (try_stmt->finally_block) {
-        gen_block(try_stmt->finally_block.get());
-    }
-
-    size_t exit_try_idx = curr_code_list.size();
     curr_code_list.emplace_back(
-        Opcode::EXIT_TRY, std::vector<size_t>{0}, try_stmt->pos
-    );
-
-    curr_code_list.emplace_back(
-        Opcode::LOAD_ERROR, std::vector<size_t>{}, try_stmt->pos
+    Opcode::LOAD_ERROR, std::vector<size_t>{}, try_stmt->pos
     );
 
     curr_code_list.emplace_back(
         Opcode::THROW, std::vector<size_t>{}, try_stmt->pos
     );
 
-    size_t end_all_catch_idx = curr_code_list.size();
-    curr_code_list[try_end_idx].opn_list[0] = finally_start_idx;
-    curr_code_list[exit_try_idx].opn_list[0] = end_all_catch_idx;
-
-    for (auto idx : catch_jump_to_finally) {
-        curr_code_list[idx].opn_list[0] = finally_start_idx;
+    // finally
+    const size_t finally_start_idx = curr_code_list.size();
+    if (try_stmt->finally_block) {
+        gen_block(try_stmt->finally_block.get());
     }
+    curr_code_list[try_start_idx].opn_list[1] = finally_start_idx;
+    curr_code_list[try_end_idx].opn_list[0] = finally_start_idx;
+
+    for (auto pos : catch_jump_to_finally) {
+        curr_code_list[pos].opn_list[0] = finally_start_idx;
+    }
+
+    curr_code_list.emplace_back(
+        Opcode::POP_TRY_FRAME, std::vector<size_t>{}, try_stmt->pos
+    );
 }
 
 }
