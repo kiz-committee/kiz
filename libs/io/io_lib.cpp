@@ -24,7 +24,7 @@ std::streamsize util_write(const std::string& path,
         file.open(path, std::ios::trunc | std::ios::out | std::ios::binary);
         // 二次打开失败，抛出带路径的异常（权限不足/路径非法等）
         if (!file.is_open()) {
-            throw kiz::NativeFuncError("IOError","Failed to open/create file: " + path);
+            throw NativeFuncError("IOError","Failed to open/create file: " + path);
         }
     }
 
@@ -34,7 +34,7 @@ std::streamsize util_write(const std::string& path,
         file.seekp(n, std::ios::beg);
         // 校验偏移是否成功（如n为负数、超出系统最大文件偏移量等情况）
         if (file.tellp() != n) {
-            throw kiz::NativeFuncError("IOError","Failed to seek to offset: " + std::to_string(n));
+            throw NativeFuncError("IOError","Failed to seek to offset: " + std::to_string(n));
         }
 
         // 处理偏移量超出文件大小的情况：自动填充0补全空隙，避免文件空洞
@@ -61,14 +61,13 @@ std::streamsize util_write(const std::string& path,
 
         // 校验写入是否成功：检测流的错误状态
         if (file.fail()) {
-            throw kiz::NativeFuncError("IOError", "File write failed at offset: " + std::to_string(n));
+            throw NativeFuncError("IOError", "File write failed at offset: " + std::to_string(n));
         }
 
         // 返回实际写入的字节数
         return text.size();
     } catch (const std::exception& e) {
-        // 包装异常信息，增加文件路径，方便问题定位
-        throw kiz::NativeFuncError("IOError","File: " + path + ", " + e.what());
+        throw NativeFuncError("IOError","File: " + path + ", " + e.what());
     }
 }
 
@@ -89,7 +88,7 @@ model::Object* fast_read(model::Object* self, const model::List* args) {
     std::ifstream file(path_str->val, std::ios::binary | std::ios::in);
 
     if (!file.is_open()) {
-        throw kiz::NativeFuncError("PathError", "Failed to open file: " + path_str->val);
+        throw NativeFuncError("PathError", "Failed to open file: " + path_str->val);
     }
 
     auto content = std::string(std::istreambuf_iterator(file),

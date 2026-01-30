@@ -32,3 +32,11 @@ public:
     explicit KizStopRunningSignal(const std::string& msg) noexcept
         : std::runtime_error(msg) {}
 };
+
+class NativeFuncError final : public std::runtime_error {
+public:
+    std::string name;
+    std::string msg;
+    explicit NativeFuncError(std::string  name_, std::string  msg_) noexcept
+        : name(std::move(name_)), msg(msg_), std::runtime_error(msg_) {}
+};

@@ -253,7 +253,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         DEBUG_OUTPUT("parsing for");
         auto tok = skip_token("for");
         const std::string name = skip_token().text;
-        skip_token(":");
+        skip_token("in");
         std::unique_ptr<Expr> expr = parse_expression();
 
         skip_start_of_block();

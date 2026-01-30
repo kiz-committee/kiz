@@ -77,6 +77,7 @@ void IRGenerator::gen_expr(Expr* expr) {
             else if (bin_expr->op == "and") opc = Opcode::OP_AND;
             else if (bin_expr->op == "or") opc = Opcode::OP_OR;
             else if (bin_expr->op == "is") opc = Opcode::OP_IS;
+            else if (bin_expr->op == "in") opc = Opcode::OP_IN;
 
             else assert(false && "gen_expr: 未支持的二元运算符");
 

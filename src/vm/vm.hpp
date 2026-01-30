@@ -56,14 +56,6 @@ struct CallFrame {
     std::vector<TryBlockInfo> try_blocks;
 };
 
-class NativeFuncError final : public std::runtime_error {
-public:
-    std::string name;
-    std::string msg;
-    explicit NativeFuncError(std::string  name_, std::string  msg_) noexcept
-        : name(std::move(name_)), msg(msg_), std::runtime_error(msg_) {}
-};
-
 class Vm {
 public:
     static dep::HashMap<model::Module*> loaded_modules;
@@ -129,6 +121,7 @@ private:
     static void exec_NOT(const Instruction& instruction);
     static void exec_OR(const Instruction& instruction);
     static void exec_IS(const Instruction& instruction);
+    static void exec_IN(const Instruction& instruction);
 
     static void exec_MAKE_LIST(const Instruction& instruction);
     static void exec_MAKE_DICT(const Instruction& instruction);

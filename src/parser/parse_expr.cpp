@@ -24,6 +24,7 @@ std::unique_ptr<Expr> Parser::parse_and_or() {
         curr_token().type == TokenType::And
         or curr_token().type == TokenType::Or
         or curr_token().type == TokenType::Is
+        or curr_token().type == TokenType::In
     ) {
         auto op_token = skip_token(curr_token().text);
         auto right = parse_comparison(); // 解析右侧比较表达式

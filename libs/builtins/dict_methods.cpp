@@ -100,7 +100,7 @@ Object* dict_getitem(Object* self, const List* args) {
         return found_pair_it->value.second;
     }
 
-    throw kiz::NativeFuncError("KeyError",
+    throw NativeFuncError("KeyError",
             "Undefined key " + key_obj->debug_string() + " in Dictionary object " + self->debug_string()
     );
 }

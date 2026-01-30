@@ -187,7 +187,7 @@ void Vm::exec_LE(const Instruction& instruction) {
 }
 
 void Vm::exec_NE(const Instruction& instruction) {
-    auto [a, b] = fetch_two_from_stack_top("le");
+    auto [a, b] = fetch_two_from_stack_top("ne");
     call_function(get_attr(a, "__eq__"), new model::List({b}), a);
     if (is_true(op_stack.top())) {
         op_stack.pop();
@@ -196,6 +196,11 @@ void Vm::exec_NE(const Instruction& instruction) {
     }
     op_stack.pop();
     op_stack.emplace(new model::Bool(true));
+}
+
+void Vm::exec_IN(const Instruction& instruction) {
+    auto [item, for_check] = fetch_two_from_stack_top("contains");
+    handle_call(get_attr(for_check, "contains"), new model::List({item}), for_check);
 }
 
 }

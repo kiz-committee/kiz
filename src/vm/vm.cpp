@@ -275,6 +275,7 @@ void Vm::execute_instruction(const Instruction& instruction) {
         case Opcode::OP_NOT:          exec_NOT(instruction);          break;
         case Opcode::OP_OR:           exec_OR(instruction);           break;
         case Opcode::OP_IS:           exec_IS(instruction);           break;
+        case Opcode::OP_IN:           exec_IN(instruction);           break;
         case Opcode::MAKE_LIST:       exec_MAKE_LIST(instruction);    break;
         case Opcode::MAKE_DICT:       exec_MAKE_DICT(instruction);    break;
 

@@ -84,7 +84,7 @@ Object* rational_div(Object* self, const List* args) {
     auto another_int = dynamic_cast<Int*>(args->val[0]);
     if (another_int) {
         if (another_int->val == dep::BigInt(0)) {
-            throw kiz::NativeFuncError("CalculateError", "Rational division by zero");
+            throw NativeFuncError("CalculateError", "Rational division by zero");
         }
         dep::Rational rhs_rational(another_int->val, dep::BigInt(1));
         return new Rational(self_rational->val / rhs_rational);

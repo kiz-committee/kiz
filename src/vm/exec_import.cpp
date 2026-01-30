@@ -52,7 +52,7 @@ fs::path get_exe_abs_path() {
     } else if (len > 0) {
         exe_path = std::wstring(buf, len);
     } else {
-        throw kiz::NativeFuncError("PathError","Windows GetModuleFileNameW failed, error code: " + std::to_string(GetLastError()));
+        throw NativeFuncError("PathError","Windows GetModuleFileNameW failed, error code: " + std::to_string(GetLastError()));
     }
 #elif defined(__linux__)
     // Linux平台：读取/proc/self/exe符号链接（指向当前进程的可执行文件）

@@ -69,7 +69,7 @@ public:
     // 除法：a/b ÷ c/d = (a*d)/(b*c)（需检查除数不为0）
     Rational operator/(const Rational& rhs) const {
         if (rhs.numerator == BigInt(0)) {
-            throw kiz::NativeFuncError("CalculateError", "Rational division by zero");
+            throw NativeFuncError("CalculateError", "Rational division by zero");
         }
         return Rational(
             numerator * rhs.denominator,
@@ -124,7 +124,7 @@ private:
     void reduce() {
         // 检查分母是否为0
         if (denominator == BigInt(0)) {
-            throw kiz::NativeFuncError("CalculateError", "Rational denominator cannot be zero");
+            throw NativeFuncError("CalculateError", "Rational denominator cannot be zero");
         }
 
         // 规范分母符号（分母为负则将负号转移到分子）

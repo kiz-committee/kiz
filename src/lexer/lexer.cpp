@@ -50,6 +50,7 @@ void register_keywords() {
     keywords["or"] = TokenType::Or;
     keywords["not"] = TokenType::Not;
     keywords["is"] = TokenType::Is;
+    keywords["in"] = TokenType::In;
 
     keywords_registered = true;
 }
