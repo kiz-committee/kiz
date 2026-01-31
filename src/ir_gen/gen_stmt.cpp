@@ -430,7 +430,7 @@ void IRGenerator::gen_try(TryStmt* try_stmt) {
         try_stmt->pos
     );
 
-    curr_code_list[try_start_idx].opn_list[0] = try_end_idx;
+    curr_code_list[try_start_idx].opn_list[0] = curr_code_list.size();
 
     std::vector<size_t> catch_jump_to_finally;
     for (const auto& catch_stmt : try_stmt->catch_blocks) {
