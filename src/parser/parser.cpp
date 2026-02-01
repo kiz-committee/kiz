@@ -44,6 +44,7 @@ Token Parser::skip_token(const std::string& want_skip) {
     // 严格报错
     err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Invalid token/grammar");
     DEBUG_OUTPUT("You want to skip "+want_skip);
+    throw std::runtime_error("Invalid token/grammar");
 }
 
 // curr_token实现
