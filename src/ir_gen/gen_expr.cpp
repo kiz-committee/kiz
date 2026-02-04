@@ -182,11 +182,11 @@ void IRGenerator::gen_expr(Expr* expr) {
             gen_block(lambda->body.get());
             // 确保lambda有返回值（无显式返回则返回Nil）
             if (curr_code_list.empty() || curr_code_list.back().opc != Opcode::RET) {
-                const auto nil = new model::Nil();
+                const auto nil = model::load_nil();
                 const size_t nil_idx = get_or_add_const(curr_consts, nil);
                 curr_code_list.emplace_back(
                     Opcode::LOAD_CONST,
-                    std::vector<size_t>{nil_idx},
+                    std::vector{nil_idx},
                     expr->pos
                 );
                 curr_code_list.emplace_back(

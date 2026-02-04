@@ -16,8 +16,8 @@ Object* int_call(Object* self, const List* args) {
 // Int.__bool__
 Object* int_bool(Object* self, const List* args) {
     const auto self_int = dynamic_cast<Int*>(self);
-    if (self_int->val == dep::BigInt(0)) return new Bool(false);
-    return new Bool(true);
+    if (self_int->val == dep::BigInt(0)) return load_false();
+    return load_true();
 }
 
 // Int.__add__ 整数加法：self + args[0]（仅支持Int/Decimal）
@@ -169,13 +169,13 @@ Object* int_eq(Object* self, const List* args) {
     // 与Int比较
     auto another_int = dynamic_cast<Int*>(args->val[0]);
     if (another_int) {
-        return new Bool(self_int->val == another_int->val);
+        return load_bool(self_int->val == another_int->val);
     }
     // 与Decimal比较
     auto another_dec = dynamic_cast<Decimal*>(args->val[0]);
     if (another_dec) {
         dep::Decimal cmp_val(self_int->val);
-        return new Bool(cmp_val == another_dec->val);
+        return load_bool(cmp_val == another_dec->val);
     }
     // 仅允许Int/Decimal
     assert(false && "function Int.eq second arg need be Int or Decimal");
@@ -190,13 +190,13 @@ Object* int_lt(Object* self, const List* args) {
     // 与Int比较
     auto another_int = dynamic_cast<Int*>(args->val[0]);
     if (another_int) {
-        return new Bool(self_int->val < another_int->val);
+        return load_bool(self_int->val < another_int->val);
     }
     // 与Decimal比较
     auto another_dec = dynamic_cast<Decimal*>(args->val[0]);
     if (another_dec) {
         dep::Decimal cmp_val(self_int->val);
-        return new Bool(cmp_val < another_dec->val);
+        return load_bool(cmp_val < another_dec->val);
     }
     // 仅允许Int/Decimal
     assert(false && "function Int.lt second arg need be Int or Decimal");
@@ -211,13 +211,13 @@ Object* int_gt(Object* self, const List* args) {
     // 与Int比较
     auto another_int = dynamic_cast<Int*>(args->val[0]);
     if (another_int) {
-        return new Bool(self_int->val > another_int->val);
+        return load_bool(self_int->val > another_int->val);
     }
     // 与Decimal比较
     auto another_dec = dynamic_cast<Decimal*>(args->val[0]);
     if (another_dec) {
         dep::Decimal cmp_val(self_int->val);
-        return new Bool(cmp_val > another_dec->val);
+        return load_bool(cmp_val > another_dec->val);
     }
     // 仅允许Int/Decimal
     assert(false && "function Int.gt second arg need be Int or Decimal");
@@ -226,7 +226,7 @@ Object* int_gt(Object* self, const List* args) {
 // Int.__hash__
 Object* int_hash(Object* self, const List* args) {
     auto self_int = dynamic_cast<Int*>(self);
-    return new Int(self_int->val);
+    return create_int(self_int->val);
 }
 
 Object* int_str(Object* self, const List* args) {

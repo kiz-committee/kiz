@@ -70,9 +70,9 @@ Object* dict_contains(Object* self, const List* args) {
     );
 
     if (found_pair_it) {
-        return new Bool(true);
+        return load_true();
     }
-    return new Bool(false);
+    return load_false();
 };
 
 Object* dict_setitem(Object* self, const List* args) {
@@ -86,7 +86,7 @@ Object* dict_setitem(Object* self, const List* args) {
         key_hash_val,
         std::pair{key_obj, value_obj}
     );
-    return new Nil();
+    return load_nil();
 }
 
 Object* dict_getitem(Object* self, const List* args) {

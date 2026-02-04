@@ -35,6 +35,9 @@ dep::HashMap<model::Object*> Vm::std_modules {};
 
 Vm::Vm(const std::string& file_path_) {
     file_path = file_path_;
+    model::unique_nil->make_ref();
+    model::unique_true->make_ref();
+    model::unique_false->make_ref();
     DEBUG_OUTPUT("entry builtin functions...");
     for (dep::BigInt i = 0; i < 201; i+= 1) {
         small_int_pool[i.to_unsigned_long_long()] = new model::Int{i};

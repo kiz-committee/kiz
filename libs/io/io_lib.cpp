@@ -112,7 +112,7 @@ model::Object* fast_write(model::Object* self, const model::List* args) {
 
     util_write(path_str->val, text_str->val, start_idx->val.to_unsigned_long_long());
 
-    return new model::Nil();
+    return model::load_nil();
 }
 
 }

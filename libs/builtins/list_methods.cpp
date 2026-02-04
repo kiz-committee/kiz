@@ -12,8 +12,8 @@ Object* list_call(Object* self, const List* args) {
 // List.__bool__
 Object* list_bool(Object* self, const List* args) {
     const auto self_int = dynamic_cast<List*>(self);
-    if (self_int->val.empty()) return new Bool(false);
-    return new Bool(true);
+    if (self_int->val.empty()) return load_false();
+    return load_true();
 }
 
 //  List.__add__：拼接另一个List（self + 传入List，返回新List）
@@ -155,11 +155,11 @@ Object* list_contains(Object* self, const List* args) {
         const auto result = kiz::Vm::fetch_one_from_stack_top();
 
         // 找到匹配元素，立即返回true
-        if (kiz::Vm::is_true(result)) return new Bool(true);
+        if (kiz::Vm::is_true(result)) return load_true();
     }
     
     // 遍历完未找到匹配元素，返回false
-    return new Bool(false);
+    return load_false();
 };
 
 // List.append：向列表尾部添加一个元素
@@ -211,14 +211,14 @@ Object* list_foreach(Object* self, const List* args) {
         kiz::Vm::call_function(func_obj, new List({e}), nullptr);
         idx += 1;
     }
-    return new Nil();
+    return load_nil();
 }
 
 Object* list_reverse(Object* self, const List* args) {
     const auto self_list = dynamic_cast<List*>(self);
     assert(self_list != nullptr);
     std::ranges::reverse(self_list->val);
-    return new Nil();
+    return load_nil();
 }
 
 Object* list_extend(Object* self, const List* args) {
@@ -231,14 +231,14 @@ Object* list_extend(Object* self, const List* args) {
     for (auto e: other_list->val) {
         self_list->val.push_back(e);
     }
-    return new Nil();
+    return load_nil();
 }
 
 Object* list_pop(Object* self, const List* args) {
     auto self_list = dynamic_cast<List*>(self);
     assert(self_list != nullptr);
     self_list->val.pop_back();
-    return new Nil();
+    return load_nil();
 }
 
 Object* list_insert(Object* self, const List* args) {
@@ -254,7 +254,7 @@ Object* list_insert(Object* self, const List* args) {
             self_list->val[idx] = value_obj;
         }
     }
-    return new Nil();
+    return load_nil();
 }
 
 Object* list_setitem(Object* self, const List* args) {
@@ -265,8 +265,11 @@ Object* list_setitem(Object* self, const List* args) {
     auto index = idx_obj->val.to_unsigned_long_long();
 
     auto value_obj = args->val[1];
-    self_list->val[index] = value_obj;
-    return new Nil();
+
+    if (index < self_list->val.size()) {
+        self_list->val[index] = value_obj;;
+    }
+    assert(false);
 }
 
 Object* list_getitem(Object* self, const List* args) {
@@ -275,11 +278,14 @@ Object* list_getitem(Object* self, const List* args) {
     assert(idx_obj != nullptr);
 
     auto index = idx_obj->val.to_unsigned_long_long();
-    return self_list->val[index];
+    if (index < self_list->val.size()) {
+        return self_list->val[index];
+    }
+    assert(false);
 }
 
 Object* list_count(Object* self, const List* args) {
-    return new Nil();
+    return load_nil();
 }
 
 Object* list_find(Object* self, const List* args) {
@@ -296,7 +302,7 @@ Object* list_find(Object* self, const List* args) {
             return res;
         }
     }
-    return new Nil();
+    return load_nil();
 }
 
 Object* list_map(Object* self, const List* args) {

@@ -106,7 +106,7 @@ void Vm::exec_NOT(const Instruction& instruction) {
     auto a = op_stack.top();
     op_stack.pop();
     bool result = !is_true(a);
-    op_stack.emplace(new model::Bool(result));
+    op_stack.emplace(model::load_bool(result));
 }
 
 void Vm::exec_AND(const Instruction& instruction) {

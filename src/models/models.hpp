@@ -372,15 +372,12 @@ inline auto unique_false = new Bool(false);
 inline auto unique_true = new Bool(true);
 
 inline auto load_nil() {
-    unique_nil->make_ref();
     return unique_nil;
 }
 inline auto load_false() {
-    unique_false->make_ref();
     return unique_false;
 }
 inline auto load_true() {
-    unique_true->make_ref();
     return unique_true;
 }
 

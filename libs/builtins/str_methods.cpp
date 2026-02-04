@@ -18,7 +18,7 @@ Object* str_call(Object* self, const List* args) {
 // String.__bool__
 Object* str_bool(Object* self, const List* args) {
     const auto self_int = dynamic_cast<String*>(self);
-    if (self_int->val.empty()) return new Bool(false);
+    if (self_int->val.empty()) load_false();
     return load_true();
 }
 
@@ -55,7 +55,7 @@ Object* str_mul(Object* self, const List* args) {
         result += self_str->val;
     }
     
-    return new String(std::move(result));
+    return create_str(std::move(result));
 };
 
 // String.__eq__：判断两个字符串是否相等 self == x
@@ -69,7 +69,7 @@ Object* str_eq(Object* self, const List* args) {
     auto another_str = dynamic_cast<String*>(args->val[0]);
     assert(another_str != nullptr && "String.eq only supports String type argument");
     
-    return new Bool(self_str->val == another_str->val);
+    return load_bool(self_str->val == another_str->val);
 };
 
 // String.__contains__：判断是否包含子字符串 x in self
@@ -84,7 +84,7 @@ Object* str_contains(Object* self, const List* args) {
     assert(sub_str != nullptr && "String.contains only supports String type argument");
     
     bool exists = self_str->val.find(sub_str->val) != std::string::npos;
-    return new Bool(exists);
+    return load_bool(exists);
 };
 
 // String.__hash__
@@ -92,7 +92,7 @@ Object* str_hash(Object* self, const List* args) {
     auto self_str = dynamic_cast<String*>(self);
     assert(self_str != nullptr && "str_hash must be called by String object");
     auto hashed_str = dep::hash_string(self_str->val);
-    return new Int(dep::BigInt(hashed_str));
+    return create_int(dep::BigInt(hashed_str));
 }
 
 Object* str_next(Object* self, const List* args) {
@@ -143,7 +143,7 @@ Object* str_foreach(Object* self, const List* args) {
         }), nullptr);
         idx += 1;
     }
-    return new Nil();
+    return load_nil();
 }
 
 Object* str_count(Object* self, const List* args) {
@@ -165,12 +165,12 @@ Object* str_count(Object* self, const List* args) {
 
 
 Object* str_startswith(Object* self, const List* args) {
-    return new Nil();
+    return load_nil();
 
 }
 
 Object* str_endswith(Object* self, const List* args) {
-    return new Nil();
+    return load_nil();
 
 }
 

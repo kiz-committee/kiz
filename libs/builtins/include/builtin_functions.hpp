@@ -19,16 +19,16 @@ inline model::Object* check_based_object_inner(
 ) {
     if (src_obj == nullptr) return nullptr;
     // 闭环检测
-    if (visited.contains(src_obj)) return new model::Bool(false);
+    if (visited.contains(src_obj)) return model::load_false();
     visited.insert(src_obj);
 
     // 查找__parent__属性
     const auto it = src_obj->attrs.find("__parent__");
     if (it == nullptr) {
-        return new model::Bool(false);
+        return  model::load_false();
     }
     // 找到目标返回true，否则递归检查父对象
-    if (it->value == for_check_obj) return new model::Bool(true);
+    if (it->value == for_check_obj) return  model::load_true();
     return check_based_object_inner(it->value, for_check_obj, visited);
 }
 

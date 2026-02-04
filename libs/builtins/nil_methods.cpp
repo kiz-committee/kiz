@@ -12,12 +12,12 @@ Object* nil_eq(Object* self, const List* args) {
     
     // Nil仅与自身相等
     auto another_nil = dynamic_cast<Nil*>(args->val[0]);
-    return new Bool(another_nil != nullptr);
+    return load_bool(another_nil != nullptr);
 }
 
 // Nil.__hash__
 Object* nil_hash(Object* self, const List* args) {
-    return new Int(0);
+    return create_int(0);
 }
 
 Object* nil_str(Object* self, const List* args) {

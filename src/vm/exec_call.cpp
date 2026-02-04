@@ -268,7 +268,7 @@ void Vm::exec_RET(const Instruction& instruction) {
 
     CallFrame* caller_frame = call_stack.back().get();
 
-    model::Object* return_val = new model::Nil();
+    model::Object* return_val = model::load_nil();
     return_val->make_ref();
     if (!op_stack.empty()) {
         return_val->del_ref();

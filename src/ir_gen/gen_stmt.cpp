@@ -171,7 +171,7 @@ void IRGenerator::gen_block(const BlockStmt* block) {
                     gen_expr(ret_stmt->expr.get());
                 } else {
                     // 无返回值时压入Nil常量
-                    auto* nil = new model::Nil();
+                    auto* nil = model::load_nil();
                     const size_t const_idx = get_or_add_const(curr_consts, nil);
                     curr_code_list.emplace_back(
                         Opcode::LOAD_CONST,

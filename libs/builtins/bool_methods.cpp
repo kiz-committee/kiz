@@ -26,16 +26,16 @@ Object* bool_eq(Object* self, const List* args) {
     auto another_bool = dynamic_cast<Bool*>(args->val[0]);
     assert(another_bool != nullptr && "Bool.eq only supports Bool type argument");
     
-    return new Bool(self_bool->val == another_bool->val);
+    return load_bool(self_bool->val == another_bool->val);
 };
 
 // Bool.__hash__
 Object* bool_hash(Object* self, const List* args) {
     auto self_bool = dynamic_cast<Bool*>(self);
     if (self_bool->val == true) {
-        return new Int(1);
+        return create_int(1);
     }
-    return new Int(0);
+    return create_int(0);
 }
 
 
