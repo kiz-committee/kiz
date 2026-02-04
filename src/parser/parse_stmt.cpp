@@ -135,9 +135,19 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
 
         // 解析参数列表（()包裹，逻辑不变）
         std::vector<std::string> func_params;
+        bool has_rest_params = false;
         if (curr_token().type == TokenType::LParen) {
             skip_token("(");
             while (curr_token().type != TokenType::RParen) {
+                if (curr_token().type == TokenType::TripleDot) {
+                    has_rest_params = true;
+                    skip_token("...");
+                    func_params.push_back(skip_token().text);
+                    if (curr_token().type == TokenType::Comma) {
+                        skip_token(",");
+                    }
+                    break;
+                }
                 func_params.push_back(skip_token().text);
                 // 处理参数间的逗号
                 if (curr_token().type == TokenType::Comma) {
@@ -159,7 +169,8 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             tok.pos,
             func_name,
             std::move(func_params),
-            std::move(func_body)
+            std::move(func_body),
+            has_rest_params
         ));
     }
 

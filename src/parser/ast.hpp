@@ -327,8 +327,9 @@ struct FnDeclExpr final :  Expr {
     std::string name;
     std::vector<std::string> params;
     std::unique_ptr<BlockStmt> body;
-    FnDeclExpr(const err::PositionInfo& pos, std::string n, std::vector<std::string> p, std::unique_ptr<BlockStmt> b)
-        : name(std::move(n)), params(std::move(p)), body(std::move(b)) {
+    bool has_rest_params = false;
+    FnDeclExpr(const err::PositionInfo& pos, std::string n, std::vector<std::string> p, std::unique_ptr<BlockStmt> b, bool has_rest_params)
+        : name(std::move(n)), params(std::move(p)), body(std::move(b)), has_rest_params(has_rest_params) {
         this->pos = pos;
         this->ast_type = AstType::FuncDeclExpr;
     }

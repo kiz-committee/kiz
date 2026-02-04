@@ -251,10 +251,10 @@ std::vector<Token> Lexer::tokenize(const std::string& src, size_t lineno_start) 
                         next(); // 消费第三个点
                         emit_token(TokenType::TripleDot, start_pos, cp_pos_,
                                   lineno_, col_ - 3, lineno_, col_);
-                        } else {
-                            emit_token(TokenType::Dot, start_pos, cp_pos_,
+                    } else {
+                        emit_token(TokenType::Dot, start_pos, cp_pos_,
                                       lineno_, col_ - 1, lineno_, col_ - 1);
-                        }
+                    }
                 }
                 else {
                     // 未知字符：错误报告

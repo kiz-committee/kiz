@@ -63,13 +63,15 @@ void Vm::handle_call(model::Object* func_obj, model::Object* args_obj, model::Ob
 
         // 校验参数数量
         const size_t required_argc = func->argc;
-        const size_t actual_argc = self and self->get_type() != model::Object::ObjectType::OT_Module
-            ? args_list->val.size() + 1
-            : args_list->val.size();
-        if (actual_argc != required_argc) {
-            std::cerr << ("CALL: 参数数量不匹配（需" + std::to_string(required_argc) +
-                            "个，实际" + std::to_string(actual_argc) + "个）");
-            assert(false);
+        size_t actual_argc;
+        if (self and self->get_type() != model::Object::ObjectType::OT_Module) {
+            actual_argc = args_list->val.size() + 1;
+        } else {
+            actual_argc = args_list->val.size();
+        }
+        if (actual_argc != required_argc and !func->has_rest_params) {
+            throw NativeFuncError("ArgsError", "expect " + std::to_string(required_argc) +
+                            " args, actually: " + std::to_string(actual_argc) + "");
         }
 
         // 创建新调用帧
@@ -92,6 +94,28 @@ void Vm::handle_call(model::Object* func_obj, model::Object* args_obj, model::Ob
         if (self and self->get_type() != model::Object::ObjectType::OT_Module) {
             self->make_ref();
             args_list->val.emplace(args_list->val.begin(), self);
+        }
+
+        if (func->has_rest_params) {
+            for (size_t i = 0; i < required_argc; ++i) {
+                std::string param_name = new_frame->code_object->names[i];
+                model::Object* param_val;
+                if (i == required_argc - 1 ) {
+                    args_list->val.assign(args_list->val.begin() + i, args_list->val.end());
+                    param_val = args_list;
+                }
+                else {
+                    param_val = args_list->val[i];  // 从列表取参数
+                }
+
+                assert(param_val != nullptr && ("CALL: 参数" + std::to_string(i) + "为nil（不允许空参数）").c_str());
+
+                param_val->make_ref();
+                new_frame->locals.insert(param_name, param_val);
+            }
+
+            call_stack.emplace_back(std::move(new_frame));
+            return;
         }
 
         // 从参数列表中提取参数，存入调用帧 locals

@@ -208,6 +208,7 @@ void IRGenerator::gen_expr(Expr* expr) {
                 code_obj,
                 lambda->params.size()
             );
+            lambda_fn->has_rest_params = lambda->has_rest_params;
 
             // 恢复模块级代码容器
             curr_code_list = save_code;

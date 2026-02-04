@@ -184,9 +184,20 @@ std::unique_ptr<Expr> Parser::parse_primary() {
     if (tok.type == TokenType::Func) {
         // 解析参数列表（()包裹，逻辑不变）
         std::vector<std::string> func_params;
+        bool has_rest_params = false;
         if (curr_token().type == TokenType::LParen) {
             skip_token("(");
             while (curr_token().type != TokenType::RParen) {
+                if (curr_token().type == TokenType::TripleDot) {
+                    has_rest_params = true;
+                    skip_token("...");
+                    func_params.push_back(skip_token().text);
+                    if (curr_token().type == TokenType::Comma) {
+                        skip_token(",");
+                    }
+                    skip_token(")");  // 跳过右括号
+                    break;
+                }
                 func_params.push_back(skip_token().text);
                 // 处理参数间的逗号
                 if (curr_token().type == TokenType::Comma) {
@@ -202,7 +213,12 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         skip_start_of_block();  // 跳过参数后的换行
         auto func_body = parse_block();
         skip_token("end");
-        return std::make_unique<FnDeclExpr>(curr_token().pos, "<lambda>", std::move(func_params),std::move(func_body));
+        return std::make_unique<FnDeclExpr>(curr_token().pos,
+            "<lambda>",
+            std::move(func_params),
+            std::move(func_body),
+            has_rest_params
+            );
     }
     if (tok.type == TokenType::Pipe) {
         std::vector<std::string> params;
@@ -219,7 +235,8 @@ std::unique_ptr<Expr> Parser::parse_primary() {
             curr_token().pos,
             "lambda",
             std::move(params),
-            std::make_unique<BlockStmt>(curr_token().pos, std::move(stmts))
+            std::make_unique<BlockStmt>(curr_token().pos, std::move(stmts)),
+            false
         );
     }
     if (tok.type == TokenType::LBrace) {

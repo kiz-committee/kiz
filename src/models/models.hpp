@@ -178,6 +178,7 @@ public:
     std::string name;
     CodeObject* code = nullptr;
     size_t argc = 0;
+    bool has_rest_params = false;
 
     static constexpr ObjectType TYPE = ObjectType::OT_Function;
     [[nodiscard]] ObjectType get_type() const override { return TYPE; }
