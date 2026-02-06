@@ -160,6 +160,67 @@ std::unique_ptr<Expr> Parser::parse_factor() {
 std::unique_ptr<Expr> Parser::parse_primary() {
     DEBUG_OUTPUT("parsing primary...");
     const auto tok = skip_token();
+    // 处理f-string解析
+    if (tok.type == TokenType::FStringStart) {
+        std::unique_ptr<Expr> combined_expr = nullptr;
+
+        // 遍历f-string内部Token，直到FStringEnd
+        while (curr_token().type != TokenType::FStringEnd) {
+            if (curr_token().type == TokenType::String) {
+                // 解析字符串片段
+                auto str_tok = skip_token();
+                auto str_expr = std::make_unique<StringExpr>(str_tok.pos, str_tok.text);
+
+                // 拼接加法表达式
+                if (combined_expr == nullptr) {
+                    combined_expr = std::move(str_expr);
+                } else {
+                    combined_expr = std::make_unique<BinaryExpr>(
+                        str_tok.pos,
+                        "+",
+                        std::move(combined_expr),
+                        std::move(str_expr)
+                    );
+                }
+            } else if (curr_token().type == TokenType::InsertExprStart) {
+                // 解析插入表达式
+                skip_token(); // 跳过InsertExprStart
+
+                // 递归解析表达式（支持任意合法表达式）
+                auto expr = parse_expression();
+
+                // 跳过InsertExprEnd
+                if (curr_token().type != TokenType::InsertExprEnd) {
+                    assert(false && "Missing '}' in f-string");
+                }
+                skip_token();
+
+                // 拼接加法表达式
+                if (combined_expr == nullptr) {
+                    combined_expr = std::move(expr);
+                } else {
+                    combined_expr = std::make_unique<BinaryExpr>(
+                        expr->pos,
+                        "+",
+                        std::move(combined_expr),
+                        std::move(expr)
+                    );
+                }
+            } else {
+                assert(false && "Invalid token in f-string");
+            }
+        }
+
+        // 跳过FStringEnd Token
+        skip_token();
+
+        // 空f-string返回空字符串
+        if (combined_expr == nullptr) {
+            return std::make_unique<StringExpr>(tok.pos, "");
+        }
+
+        return combined_expr;
+    }
     if (tok.type == TokenType::Number) {
         return std::make_unique<NumberExpr>(tok.pos, tok.text);
     }

@@ -142,21 +142,26 @@ std::vector<Token> Lexer::tokenize(const std::string& src, size_t lineno_start) 
                      peek() == CHAR_QUOTE) {
                 // 跨行字符串 M"/m"
                 curr_state_ = LexState::MultilineString;
-                     }
+            }
+            else if ((current_char == dep::UTF8Char('f') || current_char == dep::UTF8Char('F')) &&
+                    cp_pos_ + 1 < total_cp_ &&
+                    (peek() == CHAR_QUOTE || peek() == CHAR_SQUOTE)) {
+                curr_state_ = LexState::FString;
+             }
             else if (is_alpha_under(current_char)) {
                 curr_state_ = LexState::Identifier;
             }
             else if (is_digit(current_char) || (current_char == CHAR_DOT && cp_pos_ + 1 < total_cp_ &&
                      is_digit(peek()))) {
                 curr_state_ = LexState::Number;
-                     }
+            }
             else if (current_char == CHAR_HASH) {
                 curr_state_ = LexState::SingleComment;
             }
             else if (current_char == CHAR_SLASH && cp_pos_ + 1 < total_cp_ &&
                      peek() == CHAR_STAR) {
                 curr_state_ = LexState::BlockComment;
-                     }
+            }
             else if (current_char == CHAR_QUOTE || current_char == CHAR_SQUOTE) {
                 curr_state_ = LexState::String;
             }
@@ -164,7 +169,7 @@ std::vector<Token> Lexer::tokenize(const std::string& src, size_t lineno_start) 
                      current_char == CHAR_LESS || current_char == CHAR_GREATER ||
                      current_char == CHAR_MINUS || current_char == CHAR_COLON) {
                 curr_state_ = LexState::Operator;
-                     }
+            }
             else {
                 // 单字符Token处理
                 size_t start_pos = cp_pos_;
@@ -316,6 +321,112 @@ std::vector<Token> Lexer::tokenize(const std::string& src, size_t lineno_start) 
             }
 
             tokens_.emplace_back(TokenType::String, content, start_lno, lineno_, start_col, col_ - 1);
+            curr_state_ = LexState::Start;
+            break;
+        }
+
+        // ======================================
+// 模板字符串状态 f"/F"（修复后）
+// ======================================
+case LexState::FString: {
+            size_t start_cp = cp_pos_;
+            size_t start_lno = lineno_;
+            size_t start_col = col_;
+
+            // 消费f/F，生成FStringStart Token
+            dep::UTF8Char f_char = src_[cp_pos_];
+            next(); // 跳过f/F
+            emit_token(TokenType::FStringStart, start_cp, cp_pos_,
+                      start_lno, start_col, lineno_, col_ - 1);
+
+            // 验证并跳过开头引号（"或'）
+            dep::UTF8Char quote_char = src_[cp_pos_];
+            if (quote_char != CHAR_QUOTE && quote_char != CHAR_SQUOTE) {
+                err::error_reporter(file_path_, {lineno_, lineno_, col_, col_},
+                                  "SyntaxError", "f-string must be followed by ' or \"");
+                curr_state_ = LexState::Start;
+                break;
+            }
+            next(); // 跳过开头引号
+
+            // 解析f-string内容
+            dep::UTF8String str_content;
+            bool unclosed = true;
+            // 新增：记录字符串内容的起始码点位置
+            size_t str_content_start = cp_pos_;
+            while (cp_pos_ < total_cp_) {
+                dep::UTF8Char c = src_[cp_pos_];
+
+                // 遇到结束引号，终止解析
+                if (c == quote_char) {
+                    unclosed = false;
+                    // 关键修复1：先处理剩余字符串，再跳过结束引号
+                    if (!str_content.empty()) {
+                        // 正确计算：起始位置是str_content_start，结束位置是当前cp_pos_（不包含结束引号）
+                        emit_token(TokenType::String, str_content_start, cp_pos_,
+                                  lineno_, col_ - str_content.size(), lineno_, col_ - 1);
+                        str_content = "";
+                    }
+                    next(); // 跳过结束引号
+                    break;
+                }
+
+                // 遇到{，处理表达式插入
+                if (c == CHAR_LBRACE) {
+                    // 先输出收集的普通字符串
+                    if (!str_content.empty()) {
+                        emit_token(TokenType::String, str_content_start, cp_pos_,
+                                  lineno_, col_ - str_content.size(), lineno_, col_ - 1);
+                        str_content = "";
+                    }
+
+                    // 生成InsertExprStart Token
+                    size_t brace_start = cp_pos_;
+                    next(); // 跳过{
+                    emit_token(TokenType::InsertExprStart, brace_start, cp_pos_,
+                              lineno_, col_ - 1, lineno_, col_ - 1);
+
+                    // 解析表达式内容（直到}，不处理嵌套）
+                    size_t expr_start = cp_pos_;
+                    size_t expr_start_col = col_; // 记录表达式起始列号
+                    while (cp_pos_ < total_cp_ && src_[cp_pos_] != CHAR_RBRACE) {
+                        next(); // 消费表达式字符
+                    }
+
+                    // 生成表达式标识符Token（简化版：假设是单个标识符）
+                    if (expr_start < cp_pos_) {
+                        emit_token(TokenType::Identifier, expr_start, cp_pos_,
+                                  lineno_, expr_start_col, lineno_, col_ - 1);
+                    }
+
+                    // 生成InsertExprEnd Token
+                    size_t rbrace_start = cp_pos_;
+                    next(); // 跳过}
+                    emit_token(TokenType::InsertExprEnd, rbrace_start, cp_pos_,
+                              lineno_, col_ - 1, lineno_, col_ - 1);
+
+                    // 重置字符串起始位置（表达式后继续收集字符串）
+                    str_content_start = cp_pos_;
+                    continue;
+                }
+
+                // 普通字符，收集到字符串缓冲区
+                str_content += c;
+                next(); // 消费字符
+            }
+
+            // 关键修复2：移除重复的剩余字符串处理（已移到结束引号判断内）
+
+            // 生成FStringEnd Token（关键修复3：修正位置和范围）
+            emit_token(TokenType::FStringEnd, cp_pos_, cp_pos_, // end_cp = cp_pos_（不扩展）
+                      lineno_, col_ - 1, lineno_, col_ - 1); // 位置修正为当前列-1
+
+            // 未闭合的f-string报错
+            if (unclosed) {
+                err::error_reporter(file_path_, {start_lno, lineno_, start_col, col_},
+                                  "SyntaxError", "Unclosed f-string literal");
+            }
+
             curr_state_ = LexState::Start;
             break;
         }

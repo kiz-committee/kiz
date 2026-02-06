@@ -60,6 +60,13 @@ enum class TokenType {
     Assign,
     // 字面量
     Number, Decimal, String,
+
+    // F-String
+    FStringStart,    // f-string 起始标记
+    InsertExprStart, // 插入表达式开始 {
+    InsertExprEnd,   // 插入表达式结束 }
+    FStringEnd,      // f-string 结束标记
+
     // 分隔符
     LParen, RParen, LBrace, RBrace, LBracket, RBracket,
     Comma, Dot, TripleDot, Semicolon,
@@ -110,7 +117,8 @@ enum class LexState {
     String,         // 普通字符串（""/''）
     MultilineString,// 跨行字符串（M"/m"）
     SingleComment,  // 单行注释（#）
-    BlockComment    // 块注释（/* */）
+    BlockComment,   // 块注释（/* */）
+    FString,        // f-string 解析状态
 };
 
 // 词法分析器类：重构为FSM，基于UTF8Char/UTF8String
