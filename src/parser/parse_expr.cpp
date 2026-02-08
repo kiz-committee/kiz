@@ -185,11 +185,24 @@ std::unique_ptr<Expr> Parser::parse_primary() {
             } else if (curr_token().type == TokenType::InsertExprStart) {
                 // 解析插入表达式
                 const auto insert_expr_start_tok = skip_token(); // 跳过InsertExprStart
+                const auto insert_expr = skip_token();
 
                 // 递归解析表达式（支持任意合法表达式）
                 // 转Str
+                Lexer lexer(file_path);
+                Parser parser(file_path);
+                lexer.prepare(insert_expr.text, insert_expr.pos.lno_start, insert_expr.pos.col_start);
+                auto tokens = lexer.tokenize();
+                auto ast = parser.parse(tokens);
+
+                assert(ast != nullptr);
+                auto expr_ast = dynamic_cast<ExprStmt*>(ast->statements.back().get());
+                assert(expr_ast != nullptr);
+
+                std::unique_ptr<Expr> sub_expr = std::move(expr_ast->expr);
+
                 auto args = std::vector<std::unique_ptr<Expr>> ();
-                args.emplace_back(std::move(parse_expression()));
+                args.emplace_back(std::move(sub_expr));
                 auto expr = std::make_unique<CallExpr>(
                     insert_expr_start_tok.pos,
                     std::make_unique<IdentifierExpr>(insert_expr_start_tok.pos, "Str"),

@@ -110,7 +110,7 @@ class Lexer {
                    size_t end_lno, size_t end_col);
 
     /// 快速生成单码点Token
-    void emit_single_cp_token(TokenType type, size_t cp_index);
+    void emit_single_cp_token(TokenType type, size_t char_index);
 
     /// 处理字符串转义（普通/跨行通用）
     static std::string handle_escape(const std::string& raw);
@@ -128,14 +128,14 @@ public:
     : file_path_(file_path) {
         init_keywords();
     }
-    void prepare(const std::string& src, size_t lineno_start = 1) {
+    void prepare(const std::string& src, size_t lineno_start = 1, size_t col_start = 1) {
         // 初始化状态
         src_ = dep::UTF8String(src);
         tokens_.clear();
         curr_state_ = LexState::Start;
         char_pos_ = 0;
         lineno_ = lineno_start;
-        col_ = 1;
+        col_ = col_start;
     }
     std::vector<Token> tokenize();
     void read_mstring();
