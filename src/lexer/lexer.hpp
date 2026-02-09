@@ -85,7 +85,6 @@ enum class LexState {
     SingleComment,  // 单行注释（#）
     BlockComment,   // 块注释（/* */）
     FString,        // f-string 解析状态
-    FStringExpr,    // 新增：解析f-string { } 内的表达式
 };
 
 // 词法分析器类：重构为FSM，基于UTF8Char/UTF8String

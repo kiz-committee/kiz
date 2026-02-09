@@ -173,6 +173,13 @@ else()
             ${CMAKE_CURRENT_BINARY_DIR}/include
     )
 
+    if (APPLE)
+        target_link_libraries(kiz PRIVATE
+                "-framework CoreFoundation"
+                "-framework CoreGraphics"
+        )
+    endif()
+
     if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         set_target_properties(kiz PROPERTIES SUFFIX ".exe")
     else()
