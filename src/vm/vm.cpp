@@ -49,13 +49,13 @@ Vm::Vm(const std::string& file_path_) {
     model::based_dict->mark_as_important();
     model::based_int->mark_as_important();
     model::based_bool->mark_as_important();
-    model::based_nil->mark_as_important();
     model::based_str->mark_as_important();
     model::based_native_function->mark_as_important();
     model::based_error->mark_as_important();
     model::based_decimal->mark_as_important();
     model::based_module->mark_as_important();
     model::stop_iter_signal->mark_as_important();
+    model::based_file_handle->mark_as_important();
     model::based_code_object->mark_as_important();
 
     for (dep::BigInt i = 0; i < 201; i+= 1) {

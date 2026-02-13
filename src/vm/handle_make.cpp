@@ -77,7 +77,7 @@ void Vm::make_dict(size_t len) {
         value->del_ref();
     }
 
-    auto* dict_obj = new model::Dictionary(dep::Dict(elem_list)); // 内部为 key/value make_ref
+    auto dict_obj = new model::Dictionary(dep::Dict(elem_list)); // 内部为 key/value make_ref
     push_to_stack(dict_obj);
 }
 }

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <bits/this_thread_sleep.h>
 
 #include "../../src/models/models.hpp"
 #include "../deps/u8str.hpp"
@@ -325,6 +326,24 @@ model::Object* debug_str(model::Object* self, const model::List* args) {
     auto for_check = get_one_arg(args);
     auto debug_str = kiz::Vm::obj_to_debug_str(for_check);
     return new model::String(debug_str);
+}
+
+model::Object* attr(model::Object* self, const model::List* args) {
+    auto obj = get_one_arg(args);
+    std::vector<std::pair<dep::BigInt, std::pair<model::Object*, model::Object*>>> elem_list;
+    for (auto& [name, obj]: obj->attrs.to_vector()) {
+        obj->make_ref();
+        elem_list.emplace_back(dep::hash_string(name),
+            std::pair {new model::String(name), obj}
+        );
+    }
+    return new model::Dictionary(dep::Dict(elem_list));
+}
+
+model::Object* sleep(model::Object* self, const model::List* args) {
+    auto time = model::cast_to_int(get_one_arg(args)) ->val.to_unsigned_long_long();
+    std::this_thread::sleep_for(std::chrono::milliseconds(time));
+    return model::load_nil();
 }
 
 }

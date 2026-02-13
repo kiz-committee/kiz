@@ -75,11 +75,11 @@ std::streamsize util_write(
 model::Object* init_module(model::Object* self, const model::List* args) {
     auto mod = new model::Module("io_lib");
 
-    auto fast_read_fun = model::create_nfunc(fast_read);
-    auto fast_write_fun = model::create_nfunc(fast_write);
+    auto fast_read_func = model::create_nfunc(fast_read);
+    auto fast_write_func = model::create_nfunc(fast_write);
 
-    mod->attrs_insert("fast_read", fast_read_fun);
-    mod->attrs_insert("fast_write", fast_write_fun);
+    mod->attrs_insert("fast_read", fast_read_func);
+    mod->attrs_insert("fast_write", fast_write_func);
 
     return mod;
 }

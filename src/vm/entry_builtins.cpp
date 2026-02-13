@@ -10,7 +10,7 @@ namespace kiz {
 void Vm::entry_builtins() {
     model::based_bool->attrs_insert("__parent__", model::based_obj);
     model::based_int->attrs_insert("__parent__", model::based_obj);
-    model::based_nil->attrs_insert("__parent__", model::based_obj);
+    model::unique_nil->attrs_insert("__parent__", model::based_obj);
     model::based_function->attrs_insert("__parent__", model::based_obj);
     model::based_decimal->attrs_insert("__parent__", model::based_obj);
     model::based_module->attrs_insert("__parent__", model::based_obj);
@@ -21,6 +21,7 @@ void Vm::entry_builtins() {
     model::based_str->attrs_insert("__parent__", model::based_obj);
     model::stop_iter_signal->attrs_insert("__parent__", model::based_obj);
     model::based_code_object->attrs_insert("__parent__", model::based_obj);
+    model::based_file_handle->attrs_insert("__parent__", model::based_obj);
 
     // Object 基类 方法
     model::based_obj->attrs_insert("__eq__", model::create_nfunc([](const model::Object* self, const model::List* args) -> model::Object* {
@@ -55,9 +56,9 @@ void Vm::entry_builtins() {
     model::based_bool->attrs_insert("__str__", model::create_nfunc(model::bool_str));
 
     // Nil 类型魔法方法
-    model::based_nil->attrs_insert("__eq__", model::create_nfunc(model::nil_eq));
-    model::based_nil->attrs_insert("__hash__", model::create_nfunc(model::nil_hash));
-    model::based_nil->attrs_insert("__str__", model::create_nfunc(model::nil_str));
+    model::unique_nil->attrs_insert("__eq__", model::create_nfunc(model::nil_eq));
+    model::unique_nil->attrs_insert("__hash__", model::create_nfunc(model::nil_hash));
+    model::unique_nil->attrs_insert("__str__", model::create_nfunc(model::nil_str));
 
     // Int 类型魔法方法
     model::based_int->attrs_insert("__add__", model::create_nfunc(model::int_add));
@@ -215,6 +216,9 @@ void Vm::entry_builtins() {
     builtin_insert("range", model::create_nfunc(builtin::range, "range"));
     builtin_insert("type_of", model::create_nfunc(builtin::type_of_obj, "type_of"));
     builtin_insert("debug_str", model::create_nfunc(builtin::debug_str, "debug_str"));
+    builtin_insert("attr", model::create_nfunc(builtin::attr, "attr"));
+    builtin_insert("sleep", model::create_nfunc(builtin::sleep, "sleep"));
+
     builtin_insert("Object", model::based_obj);
     builtin_insert("Int", model::based_int);
     builtin_insert("Bool", model::based_bool);
@@ -224,9 +228,9 @@ void Vm::entry_builtins() {
     builtin_insert("Str", model::based_str);
     builtin_insert("Func", model::based_function);
     builtin_insert("NFunc", model::based_native_function);
-    builtin_insert("__Nil", model::based_nil);
     builtin_insert("Error", model::based_error);
     builtin_insert("Module", model::based_module);
+    builtin_insert("FileHandle", model::based_file_handle);
     builtin_insert("__CodeObject", model::based_code_object);
     builtin_insert("__StopIterSignal__", model::stop_iter_signal);
 }

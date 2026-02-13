@@ -63,6 +63,8 @@ target("kiz")
     add_files("libs/builtins/dict_methods.cpp")
     add_files("libs/builtins/builtin_functions.cpp")
     add_files("libs/io/io_lib.cpp")
+    add_files("libs/os/os_lib.cpp")
+    add_files("libs/builtins/builtins_lib.cpp")
 
     -- 设置头文件搜索路径
     add_includedirs("src")

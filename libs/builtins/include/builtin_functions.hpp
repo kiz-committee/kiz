@@ -55,5 +55,7 @@ model::Object* get_refc(model::Object* self, const model::List* args);
 model::Object* create(model::Object* self, const model::List* args);
 model::Object* type_of_obj(model::Object* self, const model::List* args);
 model::Object* debug_str(model::Object* self, const model::List* args);
+model::Object* attr(model::Object* self, const model::List* args);
+model::Object* sleep(model::Object* self, const model::List* args);
 
 }

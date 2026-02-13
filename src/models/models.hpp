@@ -133,13 +133,13 @@ inline auto based_function = new Object();
 inline auto based_dict = new Object();
 inline auto based_int = new Object();
 inline auto based_bool = new Object();
-inline auto based_nil = new Object();
 inline auto based_str = new Object();
 inline auto based_native_function = new Object();
 inline auto based_error = new Object();
 inline auto based_decimal = new Object();
 inline auto based_module = new Object();
 inline auto based_code_object = new Object();
+inline auto based_file_handle = new Object();
 inline auto stop_iter_signal = new Object();
 
 class List;
@@ -396,9 +396,7 @@ public:
     static constexpr ObjectType TYPE = ObjectType::Nil;
     [[nodiscard]] ObjectType get_type() const override { return TYPE; }
 
-    explicit Nil() : Object() {
-        attrs_insert("__parent__", based_nil);
-    }
+    explicit Nil() : Object() {}
     [[nodiscard]] std::string debug_string() const override {
         return "Nil";
     }

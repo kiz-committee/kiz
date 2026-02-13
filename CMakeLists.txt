@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(kiz
-        VERSION 0.6.0
+        VERSION 0.7.0
         LANGUAGES CXX)
 
 add_compile_options(-Ofast)
@@ -14,7 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # 版本号定义
 set(KIZ_VERSION_MAJOR 0)
-set(KIZ_VERSION_MINOR 6)
+set(KIZ_VERSION_MINOR 7)
 set(KIZ_VERSION_PATCH 0)
 set(KIZ_VERSION "${KIZ_VERSION_MAJOR}.${KIZ_VERSION_MINOR}.${KIZ_VERSION_PATCH}")
 
@@ -67,6 +67,8 @@ set(LIB_SRC_FILES
         ${PROJECT_SOURCE_DIR}/libs/builtins/dict_methods.cpp
         ${PROJECT_SOURCE_DIR}/libs/builtins/builtin_functions.cpp
         ${PROJECT_SOURCE_DIR}/libs/io/io_lib.cpp
+        ${PROJECT_SOURCE_DIR}/libs/os/os_lib.cpp
+        ${PROJECT_SOURCE_DIR}/libs/builtins/builtins_lib.cpp
 )
 
 set(CLI_FILES
