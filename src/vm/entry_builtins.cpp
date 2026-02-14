@@ -162,7 +162,7 @@ void Vm::entry_builtins() {
 
     // Range类型
     model::based_range->attrs_insert("__call__", model::create_nfunc(model::range_call));
-    model::based_range->attrs_insert("__dstr__", model::create_nfunc(model::range_dstr));
+    model::based_range->attrs_insert("__str__", model::create_nfunc(model::range_str));
     model::based_range->attrs_insert("__next__", model::create_nfunc(model::range_next));
 
 

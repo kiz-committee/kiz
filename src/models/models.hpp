@@ -438,6 +438,9 @@ public:
             delete file_handle;
         }
     }
+    [[nodiscard]] std::string debug_string() const override {
+        return "fileHandle";
+    }
 
 };
 

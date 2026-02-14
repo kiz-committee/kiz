@@ -7,10 +7,9 @@ namespace model {
 
 // List.__call__
 Object* list_call(Object* self, const List* args) {
-    auto obj = new List({});
     std::vector<Object*> list = {};
     if (args->val.empty()) {
-        return obj;
+        return new List({});
     }
 
     auto for_cast = builtin::get_one_arg(args);
@@ -21,10 +20,8 @@ Object* list_call(Object* self, const List* args) {
             break;
         }
         list.push_back(res);
-        res->del_ref();
     }
-    obj->val = list;
-    return obj;
+    return new List(list);
 }
 
 // List.__bool__
@@ -120,7 +117,7 @@ Object* list_str(Object* self, const List* args) {
     auto self_list = dynamic_cast<List*>(self);
     std::string result = "[";
     for (size_t i = 0; i < self_list->val.size(); ++i) {
-        if (self_list->val[i] != nullptr) {
+        if (self_list->val[i]) {
             result += kiz::Vm::obj_to_str(self_list->val[i]);
         } else {
             result += "Nil";

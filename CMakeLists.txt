@@ -4,7 +4,7 @@ project(kiz
         VERSION 0.7.0
         LANGUAGES CXX)
 
-add_compile_options(-Ofast)
+#add_compile_options(-Ofast)
 
 # ===================== 基础配置 =====================
 # 设置C++标准

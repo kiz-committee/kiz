@@ -229,7 +229,7 @@ void Vm::call_method(model::Object* obj, const std::string& attr_name, std::vect
         return;
     }
     throw NativeFuncError("NameError",
-        "Undefined method '" + attr_name + "'" + " of " + obj->debug_string()
+        "Undefined method '" + attr_name + "'" + " of " + obj_to_debug_str(obj)
     );
 }
 

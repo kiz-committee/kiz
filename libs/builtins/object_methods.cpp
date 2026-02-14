@@ -34,26 +34,39 @@ Object* range_call(Object* self, const List* args) {
 }
 
 Object* range_next(Object* self, const List* args) {
-    dep::BigInt& start_int = cast_to_int(kiz::Vm::get_attr_current(self, "start"))->val;
-    dep::BigInt& step_int = cast_to_int(kiz::Vm::get_attr_current(self, "step"))->val;
-    dep::BigInt& end_int = cast_to_int(kiz::Vm::get_attr_current(self, "end"))->val;
+    Int* start_obj = cast_to_int(kiz::Vm::get_attr_current(self, "start"));
+    Int* step_obj = cast_to_int(kiz::Vm::get_attr_current(self, "step"));
+    Int* end_obj = cast_to_int(kiz::Vm::get_attr_current(self, "end"));
+    Int* current_obj = cast_to_int(kiz::Vm::get_attr_current(self, "current"));
 
-    Int* current = cast_to_int(kiz::Vm::get_attr_current(self, "current"));
+    dep::BigInt& start_int = start_obj->val;
+    dep::BigInt& step_int = step_obj->val;
+    dep::BigInt& end_int = end_obj->val;
+    dep::BigInt& current = current_obj->val;
 
-    if (current->val >= end_int) {
+    bool is_end = false;
+    if (step_int > 0) {
+        is_end = current >= end_int;
+    } else {
         return load_stop_iter_signal();
     }
 
-    auto old_val = current->val;
-    current->val = current->val + step_int;
+    if (is_end) {
+        return load_stop_iter_signal();
+    }
+
+    dep::BigInt old_val = current;
+    current += step_int;
+
+    // 返回迭代值
     return new Int(old_val);
 }
 
-Object* range_dstr(Object* self, const List* args) {
-    dep::BigInt& start_int = cast_to_int(kiz::Vm::get_attr_current(self, "start"))->val;
-    dep::BigInt& step_int = cast_to_int(kiz::Vm::get_attr_current(self, "step"))->val;
-    dep::BigInt& end_int = cast_to_int(kiz::Vm::get_attr_current(self, "end"))->val;
-    dep::BigInt& current = cast_to_int(kiz::Vm::get_attr_current(self, "current"))->val;
+Object* range_str(Object* self, const List* args) {
+    dep::BigInt start_int = cast_to_int(kiz::Vm::get_attr_current(self, "start"))->val;
+    dep::BigInt step_int = cast_to_int(kiz::Vm::get_attr_current(self, "step"))->val;
+    dep::BigInt end_int = cast_to_int(kiz::Vm::get_attr_current(self, "end"))->val;
+    dep::BigInt current = cast_to_int(kiz::Vm::get_attr_current(self, "current"))->val;
 
     return new String(std::format("Range(start={}, step={}, end={}, current={})", start_int.to_string(),
         step_int.to_string(), end_int.to_string(), current.to_string()));

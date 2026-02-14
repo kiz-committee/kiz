@@ -12,7 +12,7 @@
 // MinGW 下正确声明 _environ（无需 __declspec(dllimport)）
 extern char** _environ;
 #else
-#include <unistd.h>   // 用于 getcwd/chdir (Unix)
+#include <unistd.h>   // 用于 getcwd/chdir_ (Unix)
 extern char** environ;
 #endif
 
@@ -25,8 +25,8 @@ model::Object* init_module(model::Object* self, const model::List* args) {
     mod->attrs_insert("env", model::create_nfunc(get_env));
     mod->attrs_insert("exit", model::create_nfunc(exit_));
     mod->attrs_insert("cwd", model::create_nfunc(cwd));
-    mod->attrs_insert("chdir", model::create_nfunc(chdir));
-    mod->attrs_insert("mkdir", model::create_nfunc(mkdir));
+    mod->attrs_insert("chdir_", model::create_nfunc(chdir_));
+    mod->attrs_insert("mkdir", model::create_nfunc(mkdir_));
     mod->attrs_insert("rmdir", model::create_nfunc(rmdir));
     mod->attrs_insert("remove", model::create_nfunc(remove));
 
@@ -112,7 +112,7 @@ model::Object* cwd(model::Object* self, const model::List* args) {
     return new model::String(std::string(buf));
 }
 
-model::Object* chdir(model::Object* self, const model::List* args) {
+model::Object* chdir_(model::Object* self, const model::List* args) {
     auto path_obj = builtin::get_one_arg(args);
     auto path = model::cast_to_str(path_obj)->val;
 
@@ -120,14 +120,14 @@ model::Object* chdir(model::Object* self, const model::List* args) {
 #if defined(_WIN32)
     if (_chdir(path.c_str()) != 0) {
 #else
-    if (chdir(path.c_str()) != 0) {
+    if (chdir_(path.c_str()) != 0) {
 #endif
         throw NativeFuncError("SystemError", "Failed to change directory: " + path);
     }
     return model::load_nil();
 }
 
-model::Object* mkdir(model::Object* self, const model::List* args) {
+model::Object* mkdir_(model::Object* self, const model::List* args) {
     try {
         // 获取目录名称参数
         auto name_obj = builtin::get_one_arg(args);
