@@ -16,7 +16,7 @@ Object* list_call(Object* self, const List* args) {
     auto for_cast = builtin::get_one_arg(args);
     while (true) {
         kiz::Vm::call_method(for_cast, "__next__", {});
-        auto res = kiz::Vm::get_stack_top();
+        auto res = kiz::Vm::get_and_pop_stack_top();
         if (res == stop_iter_signal) {
             break;
         }
