@@ -1,4 +1,4 @@
-##include "include/os_lib.hpp"
+#include "include/os_lib.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -20,7 +20,7 @@ extern char** environ;
 namespace os_lib {
 
 model::Object* init_module(model::Object* self, const model::List* args) {
-    auto mod = new model::Module("io_lib");
+    auto mod = new model::Module("os");
 
     mod->attrs_insert("argv", model::create_nfunc(get_args));
     mod->attrs_insert("env", model::create_nfunc(get_env));
