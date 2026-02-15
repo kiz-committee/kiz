@@ -5,16 +5,15 @@
 #include <string>
 #include <filesystem>
 #include "builtins/include/builtin_functions.hpp"
-#include <climits>
 
-// os_lib.cpp 顶部（全局作用域）
 #ifdef _WIN32
-#include <direct.h>  // 用于 _getcwd/_chdir (Windows)
-// MinGW 下正确声明 _environ（无需 __declspec(dllimport)）
-extern char** _environ;
+    #include <direct.h>
+    #define PATH_MAX MAX_PATH
+    extern char** _environ;
 #else
-#include <unistd.h>   // 用于 getcwd/chdir_ (Unix)
-extern char** environ;
+    #include <unistd.h>
+    extern char** environ;
+    #include <climits>
 #endif
 
 namespace os_lib {
