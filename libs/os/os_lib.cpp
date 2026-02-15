@@ -6,20 +6,21 @@
 #include <filesystem>
 #include "builtins/include/builtin_functions.hpp"
 
-// os_lib.cpp 顶部（全局作用域）
 #ifdef _WIN32
-#include <direct.h>  // 用于 _getcwd/_chdir (Windows)
-// MinGW 下正确声明 _environ（无需 __declspec(dllimport)）
-extern char** _environ;
+    #include <windows.h>
+    #include <direct.h>
+    #define PATH_MAX MAX_PATH
+    extern char** _environ;
 #else
-#include <unistd.h>   // 用于 getcwd/chdir_ (Unix)
-extern char** environ;
+    #include <unistd.h>
+    extern char** environ;
+    #include <climits>
 #endif
 
 namespace os_lib {
 
 model::Object* init_module(model::Object* self, const model::List* args) {
-    auto mod = new model::Module("io_lib");
+    auto mod = new model::Module("os");
 
     mod->attrs_insert("argv", model::create_nfunc(get_args));
     mod->attrs_insert("env", model::create_nfunc(get_env));
@@ -120,7 +121,7 @@ model::Object* chdir_(model::Object* self, const model::List* args) {
 #if defined(_WIN32)
     if (_chdir(path.c_str()) != 0) {
 #else
-    if (chdir_(path.c_str()) != 0) {
+    if (chdir(path.c_str()) != 0) {
 #endif
         throw NativeFuncError("SystemError", "Failed to change directory: " + path);
     }
