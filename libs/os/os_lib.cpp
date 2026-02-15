@@ -7,6 +7,7 @@
 #include "builtins/include/builtin_functions.hpp"
 
 #ifdef _WIN32
+    #include <windows.h>
     #include <direct.h>
     #define PATH_MAX MAX_PATH
     extern char** _environ;
