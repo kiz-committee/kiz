@@ -3,6 +3,7 @@
 #include "vm.hpp"
 #include "../models/models.hpp"
 #include "opcode/opcode.hpp"
+#include <unordered_set>
 
 namespace kiz {
 
@@ -206,12 +207,13 @@ void Vm::call_function(model::Object* func_obj, std::vector<model::Object*> args
 void Vm::call_method(model::Object* obj, const std::string& attr_name, std::vector<model::Object*> args) {
     assert(obj != nullptr);
     auto parent_it = obj->attrs.find("__parent__");
-    static const std::vector<std::string> magic_methods = {
-        "__add__", "__sub__", "__mul__", "__div__", "__pow__", "__mod__",
-        "__neg__", "__eq__", "__gt__", "__lt__", "__str__", "__dstr__",
-        "__bool__", "__getitem__", "__setitem__", "contains", "__next__", "__hash__"
+    static const std::unordered_set<std::string_view, std::hash<std::string_view>> magic_methods = {
+        "__add__"sv, "__sub__"sv, "__mul__"sv, "__div__"sv, "__pow__"sv, "__mod__"sv,
+        "__neg__"sv, "__eq__"sv, "__gt__"sv, "__lt__"sv, "__str__"sv, "__dstr__"sv,
+        "__bool__"sv, "__getitem__"sv, "__setitem__"sv, "contains"sv, "__next__"sv, "__hash__"sv
     };
-    const bool is_magic = std::ranges::find(magic_methods, attr_name) != magic_methods.end();
+
+    const bool is_magic = magic_methods.contains(attr_name);
     if (!is_magic) {
         call_function(get_attr(obj, attr_name), args, obj);
         return;
