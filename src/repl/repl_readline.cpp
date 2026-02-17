@@ -122,10 +122,10 @@ std::string ui::get_whole_input(std::istream *is, std::ostream *os) {
     while (is->get(ch)) { // 直接判断流状态，get失败（eof/fail）时退出
         // 使用Shift+Enter组合键继续输入
         if (if_pressing_shift() && ch == '\n') {
-            *os << Color::BRIGHT_MAGENTA << "... " << Color::RESET;
+            *os << ColorInstance.BRIGHT_MAGENTA << "... " << ColorInstance.RESET;
             os->flush();
             input += ch;
-            DEBUG_OUTPUT("Add \\n to input: " << input);
+            DEBUG_OUTPUT("Add \n to input: " << input);
         } else if (ch == '\n') { // Enter结束输入
             DEBUG_OUTPUT("final returns input: " << input);
             return input;

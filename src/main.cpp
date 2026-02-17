@@ -87,22 +87,37 @@ void args_parser(const int argc, char* argv[]) {
     enable_ansi_escape();
     const char* prog_name = argv[0];
 
+    // 检查是否有--without-highlighting或-H参数
+    bool with_highlighting = true;
+    std::vector<std::string> args;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--without-highlighting" || arg == "-H") {
+            with_highlighting = false;
+        } else {
+            args.push_back(arg);
+        }
+    }
+    
+    // 初始化全局Color实例
+    init_color_instance(with_highlighting);
+
     // 无参数：默认启动REPL
-    if (argc == 1) {
-        ui::Repl repl;
+    if (args.empty()) {
+        ui::Repl repl(with_highlighting);
         repl.loop();
         return;
     }
 
     // 1个参数 : 处理 version/repl/help/路径
-    if (argc == 2) {
-        const std::string cmd = argv[1];
+    if (args.size() == 1) {
+        const std::string cmd = args[0];
         if (cmd == "version") {
             // 显示版本
             std::cout << "kiz version : " << KIZ_VERSION << std::endl;
         } else if (cmd == "repl") {
             // 显式启动REPL
-            ui::Repl repl;
+            ui::Repl repl(with_highlighting);
             repl.loop();
         } else if (cmd == "help") {
             // 显示帮助信息
@@ -111,35 +126,35 @@ void args_parser(const int argc, char* argv[]) {
             // 测试
             start_test();
         } else {
-            std::string path = argv[1];
+            std::string path = cmd;
             run_file(path);
         }
         return;
     }
 
-    const std::string first_cmd = argv[1];
+    const std::string first_cmd = args[0];
     int path_index = 0;
 
     if (first_cmd == "run") {
-        path_index = 2; // run命令后紧跟路径
-        // 如果参数数>3，收集路径后的所有参数
-        if (argc > 3) {
-            for (int i = 3; i < argc; ++i) {
-                os_lib::rest_argv.push_back(argv[i]);
+        path_index = 1; // run命令后紧跟路径
+        // 如果参数数>2，收集路径后的所有参数
+        if (args.size() > 2) {
+            for (int i = 2; i < args.size(); ++i) {
+                os_lib::rest_argv.push_back(args[i]);
             }
         }
-        std::string path = argv[path_index];
+        std::string path = args[path_index];
         run_file(path);
     } else {
         // 非run命令，第一个参数是路径（如 kiz a.kiz 1 2）
-        path_index = 1;
-        // 如果参数数>2，收集路径后的所有参数
-        if (argc > 2) {
-            for (int i = 2; i < argc; ++i) {
-                os_lib::rest_argv.push_back(argv[i]);
+        path_index = 0;
+        // 如果参数数>1，收集路径后的所有参数
+        if (args.size() > 1) {
+            for (int i = 1; i < args.size(); ++i) {
+                os_lib::rest_argv.push_back(args[i]);
             }
         }
-        std::string path = argv[path_index];
+        std::string path = args[path_index];
         run_file(path);
     }
 }
@@ -164,9 +179,9 @@ void run_file(const std::string& path) {
         if (std::string(e.what()).empty()) {
             std::exit(0);
         }
-        std::cout << Color::BOLD <<
-        Color::BRIGHT_RED << "A Panic! : " << Color::RESET
-        << Color::WHITE << " : " << e.what() << Color::RESET << "\n";
+        std::cout << ColorInstance.BOLD <<
+        ColorInstance.BRIGHT_RED << "A Panic! : " << ColorInstance.RESET
+        << ColorInstance.WHITE << " : " << e.what() << ColorInstance.RESET << "\n";
         std::exit(1);
     }
 }

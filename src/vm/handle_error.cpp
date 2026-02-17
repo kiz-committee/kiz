@@ -73,15 +73,15 @@ void Vm::handle_throw() {
 
     // 没有找到任何能处理该异常的 try 块：打印错误信息并终止执行
     if (const auto err_obj = dynamic_cast<model::Error*>(err)) {
-        std::cout << Color::BRIGHT_RED << "\nTrace Back: " << Color::RESET << std::endl;
+        std::cout << ColorInstance.BRIGHT_RED << "\nTrace Back: " << ColorInstance.RESET << std::endl;
         for (auto& [_path, _pos] : err_obj->positions) {
             err::context_printer(_path, _pos);
         }
     }
 
-    std::cout << Color::BOLD <<
-        Color::BRIGHT_RED << error_name << Color::RESET
-        << Color::WHITE << " : " << error_msg << Color::RESET << "\n";
+    std::cout << ColorInstance.BOLD <<
+        ColorInstance.BRIGHT_RED << error_name << ColorInstance.RESET
+        << ColorInstance.WHITE << " : " << error_msg << ColorInstance.RESET << "\n";
 
     std::cout << std::endl;
 

@@ -115,7 +115,7 @@ namespace ui {
 
 const std::string Repl::file_path = "<shell#>";
 
-Repl::Repl(): is_running_(true), multiline_start_(1), vm_(file_path) {
+Repl::Repl(bool with_highlighting): is_running_(true), multiline_start_(1), vm_(file_path), color_(with_highlighting) {
     std::cout << "This is the kiz REPL " << "v" << KIZ_VERSION << "\n" << std::endl;
 }
 
@@ -124,7 +124,7 @@ Repl::~Repl() {
 }
 
 std::string Repl::read(const std::string& prompt) {
-    std::cout << Color::BRIGHT_MAGENTA << prompt << Color::RESET;
+    std::cout << color_.BRIGHT_MAGENTA << prompt << color_.RESET;
     std::cout.flush();
     std::string result;
     #ifdef _WIN32

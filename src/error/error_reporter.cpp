@@ -52,11 +52,11 @@ void context_printer(
     // 格式化输出（颜色高亮+固定格式）
     std::cout << std::endl;
     // 文件路径
-    std::cout << Color::BRIGHT_BLUE << "File \"" << src_path << "\"" << Color::RESET << std::endl;
+    std::cout << ColorInstance.BRIGHT_BLUE << "File \"" << src_path << "\"" << ColorInstance.RESET << std::endl;
     // 行号 + 错误代码行
-    std::cout << Color::WHITE << line_prefix << error_line << Color::RESET << std::endl;
+    std::cout << ColorInstance.WHITE << line_prefix << error_line << ColorInstance.RESET << std::endl;
     // 箭头（对准错误列）
-    std::cout << std::string(caret_offset, ' ') << Color::BRIGHT_RED << caret << Color::RESET << std::endl;
+    std::cout << std::string(caret_offset, ' ') << ColorInstance.BRIGHT_RED << caret << ColorInstance.RESET << std::endl;
 #endif
 }
 
@@ -68,13 +68,13 @@ void error_reporter(
     const std::string& error_content
 ) {
 #ifdef __EMSCRIPTEN__
-    std::cout << error_name << ":" << error_content << Color::RESET << std::endl;
+    std::cout << error_name << ":" << error_content << ColorInstance.RESET << std::endl;
 #else
     context_printer(src_path, pos);
     // 错误信息（类型加粗红 + 内容白）
-    std::cout << Color::BOLD << Color::BRIGHT_RED << error_name
-              << Color::RESET << Color::WHITE << " : " << error_content
-              << Color::RESET << std::endl;
+    std::cout << ColorInstance.BOLD << ColorInstance.BRIGHT_RED << error_name
+              << ColorInstance.RESET << ColorInstance.WHITE << " : " << error_content
+              << ColorInstance.RESET << std::endl;
     std::cout << std::endl;
 
     throw KizStopRunningSignal();

@@ -2,3 +2,7 @@
 .gitignore
 .xmake
 cmake-build-debug
+/.idea
+/.vscode
+/CMakeFiles
+/other

@@ -17,9 +17,9 @@
 #ifdef IN_DEBUG
 #define DEBUG_OUTPUT(msg) \
     do { \
-        std::cout << Color::BRIGHT_YELLOW \
+        std::cout << ColorInstance.BRIGHT_YELLOW \
         << "[DEBUG] " << __FILE__ << ":" << __LINE__ << " | " \
-        << "msg: " << msg << Color::RESET << std::endl; \
+        << "msg: " << msg << ColorInstance.RESET << std::endl; \
     } while(0)
 
 #else

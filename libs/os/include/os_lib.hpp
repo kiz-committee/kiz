@@ -3,7 +3,7 @@
 
 namespace os_lib {
 
-inline std::vector<char*> rest_argv;
+inline std::vector<std::string> rest_argv;
 
 model::Object* init_module(model::Object* self, const model::List* args);
 

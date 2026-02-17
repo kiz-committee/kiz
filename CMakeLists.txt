@@ -77,6 +77,7 @@ set(CLI_FILES
         ${PROJECT_SOURCE_DIR}/src/util/src_manager.cpp
         ${PROJECT_SOURCE_DIR}/src/repl/repl.cpp
         ${PROJECT_SOURCE_DIR}/src/repl/repl_readline.cpp
+        ${PROJECT_SOURCE_DIR}/src/repl/color.cpp
         ${PROJECT_SOURCE_DIR}/src/main.cpp
 
 )

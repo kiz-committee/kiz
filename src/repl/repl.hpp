@@ -20,6 +20,7 @@
 #include "../parser/parser.hpp"
 #include "../vm/vm.hpp"
 #include "util/src_manager.hpp"
+#include "color.hpp"
 
 namespace ui {
 
@@ -33,6 +34,7 @@ class Repl {
     bool is_running_;
 
     kiz::Vm vm_;
+    Color color_;
 
     std::vector<std::string> last_global_var_names_ = {};
 
@@ -53,7 +55,7 @@ class Repl {
     }
 
 public:
-    Repl();
+    explicit Repl(bool with_highlighting = true);
 
     ~Repl();
 
