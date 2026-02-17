@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../deps/hashmap.hpp"
+#include "../../depends/hashmap.hpp"
 
 namespace fs = std::filesystem;
 

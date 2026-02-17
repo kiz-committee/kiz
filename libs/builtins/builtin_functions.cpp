@@ -5,7 +5,7 @@
 #include <thread>
 
 #include "../../src/models/models.hpp"
-#include "../deps/u8str.hpp"
+#include "../depends/u8str.hpp"
 
 namespace builtin {
 

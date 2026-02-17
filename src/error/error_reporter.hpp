@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "../../deps/hashmap.hpp"
+#include "../../depends/hashmap.hpp"
 
 namespace err {
 

@@ -137,7 +137,7 @@ if(BUILD_WASM)
     target_include_directories(kiz_wasm
             PRIVATE
             ${PROJECT_SOURCE_DIR}/src
-            ${PROJECT_SOURCE_DIR}/deps
+            ${PROJECT_SOURCE_DIR}/depends
             ${PROJECT_SOURCE_DIR}/libs
             ${CMAKE_CURRENT_BINARY_DIR}/include
             ${EMSCRIPTEN_ROOT_PATH}/system/include
@@ -171,7 +171,7 @@ else()
     target_include_directories(kiz
             PRIVATE
             ${PROJECT_SOURCE_DIR}/src
-            ${PROJECT_SOURCE_DIR}/deps
+            ${PROJECT_SOURCE_DIR}/depends
             ${PROJECT_SOURCE_DIR}/libs
             ${CMAKE_CURRENT_BINARY_DIR}/include
     )

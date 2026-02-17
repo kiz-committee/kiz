@@ -69,7 +69,7 @@ target("kiz")
 
     -- 设置头文件搜索路径
     add_includedirs("src")
-    add_includedirs("deps")
+    add_includedirs("depends")
     add_includedirs("libs")
     add_includedirs("cmake-build-debug/include") -- 生成的version.hpp
 

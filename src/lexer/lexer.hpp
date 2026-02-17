@@ -10,7 +10,7 @@
 #include <utility>
 #include <cstddef>
 #include <unordered_map>
-#include "../../deps/u8str.hpp"
+#include "../../depends/u8str.hpp"
 #include "../error/error_reporter.hpp"
 
 namespace kiz {

@@ -17,10 +17,10 @@
 
 #include "../kiz.hpp"
 #include "../vm/vm.hpp"
-#include "../../deps/hashmap.hpp"
-#include "../../deps/bigint.hpp"
-#include "../../deps/decimal.hpp"
-#include "../../deps/dict.hpp"
+#include "../../depends/hashmap.hpp"
+#include "../../depends/bigint.hpp"
+#include "../../depends/decimal.hpp"
+#include "../../depends/dict.hpp"
 
 
 namespace model {

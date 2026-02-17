@@ -1,4 +1,4 @@
-#include "../deps/u8str.hpp"
+#include "../depends/u8str.hpp"
 #include "../../src/models/models.hpp"
 #include "include/builtin_functions.hpp"
 
