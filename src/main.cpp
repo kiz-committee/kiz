@@ -7,7 +7,6 @@
  * @date 2025 10-25
  */
 
-#include "bigint.hpp"
 #include "repl/repl.hpp"
 #ifdef _WIN32
 #include <windows.h>
@@ -19,6 +18,8 @@
 #include "kiz.hpp"
 #include "os/include/os_lib.hpp"
 #include "util/src_manager.hpp"
+
+bool nocolor = false;
 
 /// 提供命令行帮助信息函数
 void show_help(const char* prog_name);
@@ -52,6 +53,7 @@ void enable_ansi_escape() {
             if (!SetConsoleMode(hOut, outMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) {
                 // 设置失败只是警告，不影响程序运行
                 std::cerr << "Warning: Console does not support ANSI color (STD_OUTPUT)" << std::endl;
+                nocolor = true;
             }
         } else {
             // 获取控制台模式失败（可能在测试环境或无控制台情况）
@@ -65,6 +67,7 @@ void enable_ansi_escape() {
         if (GetConsoleMode(hErr, &errMode)) {
             if (!SetConsoleMode(hErr, errMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) {
                 std::cerr << "Warning: Console does not support ANSI color (STD_ERROR)" << std::endl;
+                nocolor = true;
             }
         }
         // 获取模式失败时静默处理
@@ -85,6 +88,9 @@ void enable_ansi_escape() {
 void args_parser(const int argc, char* argv[]) {
     // 程序名称
     enable_ansi_escape();
+    if (nocolor) {
+        Color::clear_color();
+    }
     const char* prog_name = argv[0];
 
     // 检查是否有--without-highlighting或-H参数
