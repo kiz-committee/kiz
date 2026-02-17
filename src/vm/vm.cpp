@@ -69,7 +69,7 @@ Vm::Vm(const std::string& file_path_) {
     entry_std_modules();
 }
 
-void Vm::set_main_module(model::Module* src_module) {
+void Vm::set_main_module(model::Module* src_module, bool is_repl_env) {
     // 合法性校验
     assert(src_module != nullptr);
     assert(src_module->code != nullptr);
@@ -105,6 +105,7 @@ void Vm::set_main_module(model::Module* src_module) {
     // 初始化VM执行状态：标记为"就绪"
     running = true; // 标记VM为运行状态（等待exec触发执行）
     exec_curr_code();
+    if (is_repl_env) return; // repl直接返回
     // 执行ensure确保资源被释放
     handle_ensure();
 }

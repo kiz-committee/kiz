@@ -193,7 +193,7 @@ void Repl::eval_and_print(const std::string& cmd, const size_t startline) {
 
     if (kiz::Vm::call_stack.empty()) {
         const auto module = kiz::IRGenerator::gen_mod(file_path, ir);
-        kiz::Vm::set_main_module(module);
+        kiz::Vm::set_main_module(module, true);
     } else {
         if (!ir) throw KizStopRunningSignal("No ir for run" );
         kiz::Vm::reset_global_code(ir);
