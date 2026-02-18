@@ -166,21 +166,20 @@ void Repl::handle_user_input(const std::string& cmd) {
 
     // 这里要计算实际的行数
     // 在末尾添加换行符以使得slice_file_content可以识别最后一行
-    auto actual_additional_line_cnt = (err::slice_file_content(cmd + "\n")).size();
+    auto actual_additional_line_cnt = err::slice_file_content(cmd + "\n").size();
     DEBUG_OUTPUT("actual_additional_line_cnt: " << actual_additional_line_cnt);
 
     for (const auto &string_this : cmd_history_) {
         DEBUG_OUTPUT("curr: " << string_this);
     } // 似乎原来的cmd_history_永远视为一次一行，所以每一次行数加1
 
-    for (const auto &per_cmd : cmd)
+    for (const auto& per_cmd : cmd)
         cmd_history_.emplace_back(&per_cmd);
 
     // eval and print
     multiline_start_ += actual_additional_line_cnt;
     DEBUG_OUTPUT("After adding, multiline_start_: " << multiline_start_);
     eval_and_print(cmd, multiline_start_ - actual_additional_line_cnt);
-    //因为抛出错误会导致后面代码不执行，所以应当先设定multiline_start_再减掉传给它
 }
 
 void Repl::eval_and_print(const std::string& cmd, const size_t startline) {

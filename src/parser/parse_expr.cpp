@@ -352,10 +352,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         skip_token(")");
         return expr;
     }
-
-    else {
-        err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Unknown char in expression");
-    }
+    err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Invalid expression");
 }
 
 std::vector<std::unique_ptr<Expr>> Parser::parse_args(const TokenType endswith){
