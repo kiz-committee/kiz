@@ -74,13 +74,17 @@ public:
         normalize();
     }
 
-    // 从字符串构造（原逻辑正确，无需修改）
     explicit Decimal(const std::string& s) {
+        // 空字符串直接报错
+        if (s.empty()) {
+            throw NativeFuncError("ParseError", "Empty string is not a valid decimal");
+        }
+
         std::string str = s;
         bool is_neg = false;
         size_t start = 0;
 
-        // 处理符号
+        // 处理可选的正负号
         if (str[0] == '-') {
             is_neg = true;
             start = 1;
@@ -88,29 +92,105 @@ public:
             start = 1;
         }
 
-        // 处理指数部分（e/E）
-        size_t exp_pos = str.find_first_of("eE");
-        int exp = 0;
-        if (exp_pos != std::string::npos) {
-            exp = std::stoi(str.substr(exp_pos + 1));
-            str = str.substr(0, exp_pos);
+        // 如果只有符号没有数字部分，报错
+        if (start >= str.length()) {
+            throw NativeFuncError("ParseError", "Sign only without digits");
         }
 
-        // 处理小数点
-        size_t dot_pos = str.find('.', start);
+        // 检查指数部分（e/E）的位置
+        size_t exp_pos = str.find_first_of("eE", start);
+        std::string mantissa_part;   // 尾数部分（整数+小数，不含指数）
+        std::string exp_part;        // 指数部分（字符串形式）
+
+        if (exp_pos != std::string::npos) {
+            // 指数符号 e/E 后面必须有内容
+            if (exp_pos + 1 >= str.length()) {
+                throw NativeFuncError("ParseError", "Exponent symbol without following digits");
+            }
+            mantissa_part = str.substr(start, exp_pos - start);
+            exp_part = str.substr(exp_pos + 1);
+            // 指数部分允许以 + 或 - 开头
+            size_t exp_start = 0;
+            if (exp_part[0] == '+' || exp_part[0] == '-') {
+                exp_start = 1;
+            }
+            // 指数部分至少有一个数字
+            if (exp_start >= exp_part.length()) {
+                throw NativeFuncError("ParseError", "Exponent has sign but no digits");
+            }
+            // 指数部分只能包含数字
+            for (size_t i = exp_start; i < exp_part.length(); ++i) {
+                if (!std::isdigit(exp_part[i])) {
+                    throw NativeFuncError("ParseError", "Invalid character in exponent");
+                }
+            }
+        } else {
+            mantissa_part = str.substr(start);
+        }
+
+        // 检查尾数部分（小数点前后）
+        if (mantissa_part.empty()) {
+            throw NativeFuncError("ParseError", "No digits before exponent");
+        }
+
+        size_t dot_pos = mantissa_part.find('.');
+        std::string int_part, frac_part;
+
+        if (dot_pos != std::string::npos) {
+            // 不允许出现多个小数点
+            if (mantissa_part.find('.', dot_pos + 1) != std::string::npos) {
+                throw NativeFuncError("ParseError", "Multiple decimal points");
+            }
+            int_part = mantissa_part.substr(0, dot_pos);
+            frac_part = mantissa_part.substr(dot_pos + 1);
+
+            // 整数部分可以为空（如 ".123"），但至少小数部分要有数字
+            if (!int_part.empty()) {
+                for (char c : int_part) {
+                    if (!std::isdigit(c)) {
+                        throw NativeFuncError("ParseError", "Invalid character in integer part");
+                    }
+                }
+            }
+            // 小数部分不能为空（否则小数点无意义）
+            if (frac_part.empty()) {
+                throw NativeFuncError("ParseError", "Decimal point without fractional digits");
+            }
+            for (char c : frac_part) {
+                if (!std::isdigit(c)) {
+                    throw NativeFuncError("ParseError", "Invalid character in fractional part");
+                }
+            }
+        } else {
+            // 没有小数点，整个部分必须是数字
+            int_part = mantissa_part;
+            for (char c : int_part) {
+                if (!std::isdigit(c)) {
+                    throw NativeFuncError("ParseError", "Invalid character in integer part");
+                }
+            }
+            // 整数部分不能为空（已在前面检查 mantissa_part 非空）
+        }
+
+        // 解析指数（如果存在）
+        int exp = 0;
+        if (!exp_part.empty()) {
+            try {
+                exp = std::stoi(exp_part);
+            } catch (const std::exception& e) {
+                throw NativeFuncError("ParseError", "Invalid exponent format");
+            }
+        }
+
+        // 6. 构造尾数和指数（沿用原有逻辑）
         if (dot_pos == std::string::npos) {
             // 无小数点：整数
-            mantissa_ = BigInt(str.substr(start));
+            mantissa_ = BigInt(int_part);
             exponent_ = exp;
         } else {
-            // 有小数点：拆分整数和小数部分
-            std::string int_part = str.substr(start, dot_pos - start);
-            std::string frac_part = str.substr(dot_pos + 1);
-
-            // 拼接尾数（整数部分+小数部分）
+            // 有小数点：拼接整数和小数部分
             std::string mant_str = (int_part.empty() ? "0" : int_part) + frac_part;
             mantissa_ = BigInt(mant_str);
-            // 指数 = 输入指数 - 小数部分长度
             exponent_ = exp - static_cast<int>(frac_part.size());
         }
 

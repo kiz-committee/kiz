@@ -1,3 +1,4 @@
+#include "../../depends/u8str.hpp"
 #include "../../src/models/models.hpp"
 #include "../../src/vm/vm.hpp"
 #include "include/builtin_functions.hpp"
@@ -9,8 +10,24 @@ Object* int_call(Object* self, const List* args) {
     auto a = builtin::get_one_arg(args);
     dep::BigInt val(0);
     if (auto s = dynamic_cast<String*>(a)) {
-        val = dep::BigInt(s->val);
+        auto str = dep::UTF8String(s->val);
+        bool is_digit = true;
+        for (const auto& c : str) {
+            if (!c.is_digit()) is_digit = false;
+        }
+        if (is_digit) {
+            val = dep::BigInt(s->val);
+        } else {
+            throw NativeFuncError("TypeError", "Cannot cast this string to Int");
+        }
     }
+    if (auto i = dynamic_cast<Int*>(a)) {
+        val = dep::BigInt(i->val);
+    }
+    if (auto i = dynamic_cast<Decimal*>(a)) {
+        val = dep::BigInt(i->val.integer_part());
+    }
+
     else if (!kiz::Vm::is_true(a)) val = dep::BigInt(0);
     return new Int(val);
 }
