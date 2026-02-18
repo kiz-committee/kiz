@@ -3,6 +3,7 @@
 #include "vm.hpp"
 #include "../models/models.hpp"
 #include "opcode/opcode.hpp"
+#include <unordered_set>
 
 namespace kiz {
 
@@ -152,12 +153,14 @@ void Vm::handle_call(model::Object* func_obj, model::Object* args_obj, model::Ob
 
     // 处理对象魔术方法__call__
     } else {
+        model::Object* callable;
         try {
-            const auto callable = get_attr(func_obj, "__call__");
-            handle_call(callable, args_obj, func_obj);
+            callable = get_attr(func_obj, "__call__");
         } catch (NativeFuncError& e) {
             throw NativeFuncError("TypeError", "try to call an uncallable object");
         }
+        assert(callable);
+        handle_call(callable, args_obj, func_obj);
     }
 }
 
@@ -204,12 +207,19 @@ void Vm::call_function(model::Object* func_obj, std::vector<model::Object*> args
 void Vm::call_method(model::Object* obj, const std::string& attr_name, std::vector<model::Object*> args) {
     assert(obj != nullptr);
     auto parent_it = obj->attrs.find("__parent__");
-    static const std::vector<std::string> magic_methods = {
-        "__add__", "__sub__", "__mul__", "__div__", "__pow__", "__mod__",
-        "__neg__", "__eq__", "__gt__", "__lt__", "__str__", "__dstr__",
-        "__bool__", "__getitem__", "__setitem__", "contains", "__next__", "__hash__"
+    static const std::unordered_set<std::string_view> magic_methods = {
+    std::string_view("__add__"), std::string_view("__sub__"),
+    std::string_view("__mul__"), std::string_view("__div__"),
+    std::string_view("__pow__"), std::string_view("__mod__"),
+    std::string_view("__neg__"), std::string_view("__eq__"),
+    std::string_view("__gt__"), std::string_view("__lt__"),
+    std::string_view("__str__"), std::string_view("__dstr__"),
+    std::string_view("__bool__"), std::string_view("__getitem__"),
+    std::string_view("__setitem__"), std::string_view("contains"),
+    std::string_view("__next__"), std::string_view("__hash__")
     };
-    const bool is_magic = std::ranges::find(magic_methods, attr_name) != magic_methods.end();
+
+    const bool is_magic = magic_methods.contains(std::string_view(attr_name));
     if (!is_magic) {
         call_function(get_attr(obj, attr_name), args, obj);
         return;

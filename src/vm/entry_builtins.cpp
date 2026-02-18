@@ -129,10 +129,10 @@ void Vm::entry_builtins() {
     model::based_str->attrs_insert("endswith", model::create_nfunc(model::str_endswith));
     model::based_str->attrs_insert("substr", model::create_nfunc(model::str_substr));
     model::based_str->attrs_insert("len", model::create_nfunc(model::str_len));
-    model::based_str->attrs_insert("is_alaph", model::create_nfunc(model::str_is_alaph));
-    model::based_str->attrs_insert("is_digit", model::create_nfunc(model::str_is_digit));
-    model::based_str->attrs_insert("to_lower", model::create_nfunc(model::str_to_lower));
-    model::based_str->attrs_insert("to_upper", model::create_nfunc(model::str_to_upper));
+    model::based_str->attrs_insert("isalpha", model::create_nfunc(model::str_is_alpha));
+    model::based_str->attrs_insert("isdigit", model::create_nfunc(model::str_is_digit));
+    model::based_str->attrs_insert("tolower", model::create_nfunc(model::str_to_lower));
+    model::based_str->attrs_insert("toupper", model::create_nfunc(model::str_to_upper));
     model::based_str->attrs_insert("format", model::create_nfunc(model::str_format));
 
     // FileHandle类型

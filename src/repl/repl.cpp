@@ -148,7 +148,15 @@ void Repl::loop() {
                 err::SrcManager::opened_files[file_path] = code;
             }
             handle_user_input(code);
-        } catch (...) {}
+        } catch (KizStopRunningSignal& e) {
+            if (std::string(e.what()).empty()) {
+                continue;
+            }
+            std::cout << Color::BOLD <<
+            Color::BRIGHT_RED << "A Panic!" << Color::RESET
+            << Color::WHITE << " : " << e.what() << Color::RESET << "\n";
+            continue;
+        }
     }
 }
 
