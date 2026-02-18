@@ -75,7 +75,7 @@ Object* str_startswith(Object* self, const List* args);
 Object* str_endswith(Object* self, const List* args);
 Object* str_len(Object* self, const List* args);
 Object* str_substr(Object* self, const List* args);
-Object* str_is_alaph(Object* self, const List* args);
+Object* str_is_alpha(Object* self, const List* args);
 Object* str_is_digit(Object* self, const List* args);
 Object* str_to_lower(Object* self, const List* args);
 Object* str_to_upper(Object* self, const List* args);
