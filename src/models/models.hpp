@@ -46,7 +46,6 @@ namespace magic_name {
     constexpr auto contains = "contains";  // contains不是魔术方法
     constexpr auto next_item = "__next__";
     constexpr auto hash = "__hash__";
-    constexpr auto owner_module = "__owner_module__";
 }
 
 // 工具函数ptr转为地址的字符串

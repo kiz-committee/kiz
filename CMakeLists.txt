@@ -66,15 +66,15 @@ set(LIB_SRC_FILES
         ${PROJECT_SOURCE_DIR}/libs/builtins/list_methods.cpp
         ${PROJECT_SOURCE_DIR}/libs/builtins/dict_methods.cpp
         ${PROJECT_SOURCE_DIR}/libs/builtins/builtin_functions.cpp
-        ${PROJECT_SOURCE_DIR}/libs/os/os_lib.cpp
         ${PROJECT_SOURCE_DIR}/libs/builtins/file_handle_methods.cpp
         ${PROJECT_SOURCE_DIR}/libs/builtins/builtins_lib.cpp
         ${PROJECT_SOURCE_DIR}/libs/builtins/object_methods.cpp
+        ${PROJECT_SOURCE_DIR}/libs/os/os_lib.cpp
 )
 
 set(CLI_FILES
         # CLI_FILES
-        ${PROJECT_SOURCE_DIR}/src/util/src_manager.cpp
+        ${PROJECT_SOURCE_DIR}/src/error/src_manager.cpp
         ${PROJECT_SOURCE_DIR}/src/repl/repl.cpp
         ${PROJECT_SOURCE_DIR}/src/repl/repl_readline.cpp
         ${PROJECT_SOURCE_DIR}/src/main.cpp

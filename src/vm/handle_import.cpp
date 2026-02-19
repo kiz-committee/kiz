@@ -9,7 +9,7 @@
 #include "lexer/lexer.hpp"
 #include "opcode/opcode.hpp"
 #include "parser/parser.hpp"
-#include "util/src_manager.hpp"
+#include "error/src_manager.hpp"
 
 #include <filesystem>
 #include <string>

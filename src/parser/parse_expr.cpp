@@ -352,7 +352,9 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         skip_token(")");
         return expr;
     }
-    err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Invalid expression");
+    if (tok.type == TokenType::EndOfLine or tok.type == TokenType::EndOfFile)
+        err::error_reporter(file_path, tok.pos, "SyntaxError", "Expression ended invalid");
+    else err::error_reporter(file_path, tok.pos, "SyntaxError", "Invalid expression");
 }
 
 std::vector<std::unique_ptr<Expr>> Parser::parse_args(const TokenType endswith){

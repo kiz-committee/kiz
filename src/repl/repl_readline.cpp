@@ -61,7 +61,8 @@ static int find_keyboard_device() {
 }
 #endif // __linux__
 
-bool ui::if_pressing_shift() {
+namespace ui {
+bool Repl::if_pressing_shift() {
 
 #ifdef _WIN32
     // Windows 原逻辑保留
@@ -112,7 +113,7 @@ bool ui::if_pressing_shift() {
  * @param os 输出流
  * @result 完整输入
  */
-std::string ui::get_whole_input(std::istream *is, std::ostream *os) {
+std::string Repl::get_whole_input(std::istream *is, std::ostream *os) {
     assert(is && "istream pointer is null");
     assert(os && "ostream pointer is null");
 
@@ -124,12 +125,11 @@ std::string ui::get_whole_input(std::istream *is, std::ostream *os) {
         if (if_pressing_shift() && ch == '\n') {
             *os << Color::BRIGHT_MAGENTA << "... " << Color::RESET;
             os->flush();
-            input += ch;
-            DEBUG_OUTPUT("Add \\n to input: " << input);
+            input += '\n';
         } else if (ch == '\n') { // Enter结束输入
-            DEBUG_OUTPUT("final returns input: " << input);
+            input += '\n';
             return input;
-        } else if (static_cast<unsigned char>(ch) != 0xFF) { // 过滤无效字符
+        } else {
             input += ch;
         }
     }
@@ -141,4 +141,6 @@ std::string ui::get_whole_input(std::istream *is, std::ostream *os) {
 
     DEBUG_OUTPUT("final returns input (EOF): " << input);
     return input;
+}
+
 }

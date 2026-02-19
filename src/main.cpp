@@ -17,7 +17,7 @@
 
 #include "kiz.hpp"
 #include "os/include/os_lib.hpp"
-#include "util/src_manager.hpp"
+#include "error/src_manager.hpp"
 
 bool nocolor = false;
 
@@ -228,7 +228,7 @@ void run_file(const std::string& path) {
 }
 
 void show_help() {
-    const std::string text = R"(
+    static const std::string text = R"(
   _      _
  | | __ (_)  ____
  | |/ / | | |_  /

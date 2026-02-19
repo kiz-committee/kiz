@@ -19,27 +19,18 @@
 #include "../lexer/lexer.hpp"
 #include "../parser/parser.hpp"
 #include "../vm/vm.hpp"
-#include "util/src_manager.hpp"
+#include "error/src_manager.hpp"
 
 namespace ui {
 
-bool if_pressing_shift();
-std::string get_whole_input(std::istream* is, std::ostream* os);
-
 class Repl {
     static const std::string file_path;
-    std::vector<std::string> cmd_history_;
-    size_t multiline_start_;
+    std::vector<std::string> cmd_history_;  // 按行储存
     bool is_running_;
 
     kiz::Vm vm_;
 
     std::vector<std::string> last_global_var_names_ = {};
-
-    [[nodiscard]] size_t get_actual_lno() const {
-        DEBUG_OUTPUT("Getting actual_lno, original multiline_start_: " << multiline_start_);
-        return multiline_start_;
-    }
 
 
     [[nodiscard]] static std::string trim(const std::string& str) {
@@ -52,6 +43,9 @@ class Repl {
         return (left < right) ? std::string(left, right) : std::string();
     }
 
+    static bool if_pressing_shift();
+    std::string get_whole_input(std::istream* is, std::ostream* os);
+
 public:
     Repl();
 
@@ -61,7 +55,6 @@ public:
     void loop();
 
     void eval_and_print(const std::string& cmd, size_t startline);
-    void handle_user_input(const std::string& cmd);
 
     void stop() { is_running_ = false; }
 
@@ -73,4 +66,4 @@ public:
 
 
 
-} // namespace repl
+} // namespace ui
