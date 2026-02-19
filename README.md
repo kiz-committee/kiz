@@ -24,12 +24,18 @@ kiz-lang 是一门 **面向对象（原型链模型）、强类型+动态类型(
 - ✔️ 开发者友好：低门槛快速上手
 
 ## 📚 文档完善
+
 - [快速开始](docs/快速开始.md)
-- [kiz2026语法与特性文档](http://doc.kiz.random321.com)
+
+- [使用ai写kiz程序指南](docs/使用ai写kiz程序指南.md)
+- [从Python过渡到kiz](docs/从Python过渡到kiz.md]
+- [语法特性速览](docs/语法特性速览.md)
+- [内置对象&库速览](docs/内置对象&库速览.md)
+- [kiz示例代码与讲解](docs/kiz示例代码与讲解.md$
+
 - [从源代码构建kiz指南](docs/从源代码构建kiz指南.md)
 - [xmake构建教程](docs/xmake构建教程.md)
-- [内置对象&库速览](docs/内置对象&库速览.md)
-- [使用ai写kiz程序指南](docs/使用ai写kiz程序指南.md)
+
 - [项目结构与功能说明](docs/项目结构与功能说明.md)
 - [kiz库开发指南](docs/kiz库开发指南.md)
 - [提交issue/bug-report/feature-request/pull-request指南](docs/提交指南.md)
@@ -52,7 +58,6 @@ kiz-lang 是一门 **面向对象（原型链模型）、强类型+动态类型(
 
 ## 🪄 在线体验
 - **官网**: [kiz.random321.com](http://kiz.random321.com)
-- **在线文档**: [doc.kiz.random321.com](http://doc.kiz.random321.com)
 - **在线运行代码**: [try.kiz.random321.com](http://try.kiz.random321.com)
 
 ## 🧷 下载链接
