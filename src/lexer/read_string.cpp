@@ -42,8 +42,8 @@ void Lexer::read_string() {
     std::string content = handle_escape(raw);
 
     if (!closed) {
-        err::error_reporter(file_path_, {start_lno, lineno_, start_col, col_},
-                          "SyntaxError", "Unclosed string literal");
+            err::error_reporter(file_path_, {start_lno, prev_lineno_, start_col, prev_col_},
+                              "SyntaxError", "Unclosed string literal");
     }
 
     tokens_.emplace_back(TokenType::String, content, start_lno, lineno_, start_col, col_ - 1);
@@ -225,7 +225,7 @@ void Lexer::read_fstring() {
 
     // 检查未闭合的表达式
     if (in_expr) {
-        err::error_reporter(file_path_, {expr_start_lno, lineno_, expr_start_col, col_},
+        err::error_reporter(file_path_, {expr_start_lno, prev_lineno_, expr_start_col, prev_col_},
                           "SyntaxError", "Unclosed f-string expression");
     }
 

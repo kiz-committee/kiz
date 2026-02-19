@@ -38,6 +38,12 @@ void context_printer(
 
     // 按行分割
     std::vector<std::string> lines = SrcManager::splitlines(error_slice);
+    if (lines.empty()) {
+        std::cout << std::endl;
+        std::cout << Color::BRIGHT_BLUE << "File \"" << src_path << "\"" << Color::RESET << std::endl;
+        std::cout << Color::WHITE << "<no source lines available>" << Color::RESET << std::endl;
+        return;
+    }
     size_t line_count = lines.size();
 
     std::cout << std::endl;

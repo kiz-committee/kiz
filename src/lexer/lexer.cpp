@@ -51,14 +51,16 @@ void Lexer::init_keywords() {
 dep::UTF8Char Lexer::next() {
     if (char_pos_ >= src_.size()) return {'\0'};
 
+    prev_lineno_ = lineno_;
+    prev_col_ = col_;
+
     dep::UTF8Char ch = src_[char_pos_];
     char_pos_++;
 
-    // 更新行号/列号
     if (ch == '\n') {
         lineno_++;
         col_ = 1;
-    } else if (ch != '\r') { // 跳过回车符，避免重复行号
+    } else if (ch != '\r') {
         col_++;
     }
 

@@ -99,6 +99,9 @@ class Lexer {
     size_t lineno_ = 1;                     // 当前行号
     size_t col_ = 1;                        // 当前列号
 
+    size_t prev_lineno_ = 1;
+    size_t prev_col_ = 1;
+
     /// 初始化关键字（仅执行一次）
     void init_keywords();
 
