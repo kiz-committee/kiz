@@ -112,7 +112,7 @@ void Parser::skip_start_of_block() {
     //     return;
     // }
     if (curr_tok.type == TokenType::EndOfLine) {
-        skip_token("\n");
+        skip_end_of_lines();
         return;
     }
 }
