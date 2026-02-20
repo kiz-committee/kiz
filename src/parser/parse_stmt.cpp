@@ -68,7 +68,7 @@ std::unique_ptr<IfStmt> Parser::parse_if() {
     }
 
     if (curr_token().type == TokenType::End) {
-        skip_token_allow_space("end");
+        skip_end();
     }
 
     return std::make_unique<IfStmt>(if_tok.pos, std::move(cond_expr), std::move(if_block), std::move(else_block));
@@ -95,7 +95,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Invalid if condition");
         skip_start_of_block();
         auto while_block = parse_block();
-        skip_token_allow_space("end");
+        skip_end();
         return std::make_unique<WhileStmt>(tok.pos, std::move(cond_expr), std::move(while_block));
     }
 
@@ -135,7 +135,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         // 解析函数体（无大括号，用end结尾）
         skip_start_of_block();  // 跳过参数后的换行
         auto func_body = parse_block();
-        skip_token_allow_space("end");
+        skip_end();
 
         // 生成函数定义语句节点
         return std::make_unique<NamedFuncDeclStmt>(
@@ -154,7 +154,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         auto tok = skip_token("return");
         // return后可跟表达式（也可无，视为返回nil）
         std::unique_ptr<Expr> return_expr = parse_expression();
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<ReturnStmt>(tok.pos, std::move(return_expr));
     }
 
@@ -162,7 +162,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
     if (curr_tok.type == TokenType::Break) {
         DEBUG_OUTPUT("parsing break");
         auto tok = skip_token("break");
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<BreakStmt>(tok.pos);
     }
 
@@ -170,7 +170,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
     if (curr_tok.type == TokenType::Next) {
         DEBUG_OUTPUT("parsing next");
         auto tok = skip_token("next");
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<NextStmt>(tok.pos);
     }
 
@@ -187,7 +187,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             import_path = skip_token().text;
         }
 
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<ImportStmt>(tok.pos, import_path, var_name);
     }
 
@@ -198,7 +198,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         const std::string name = skip_token().text;
         skip_token("=");
         std::unique_ptr<Expr> expr = parse_expression();
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<NonlocalAssignStmt>(tok.pos, name, std::move(expr));
     }
 
@@ -209,7 +209,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         const std::string name = skip_token().text;
         skip_token("=");
         std::unique_ptr<Expr> expr = parse_expression();
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<GlobalAssignStmt>(tok.pos, name, std::move(expr));
     }
 
@@ -225,7 +225,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         }
         skip_start_of_block();
         auto object_block = parse_block();
-        skip_token_allow_space("end");
+        skip_end();
         return std::make_unique<ObjectStmt>(tok.pos, name, parent_name, std::move(object_block));
     }
     
@@ -234,7 +234,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         DEBUG_OUTPUT("parsing throw");
         auto tok = skip_token("throw");
         std::unique_ptr<Expr> expr = parse_expression();
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<ThrowStmt>(tok.pos, std::move(expr));
     }
 
@@ -248,7 +248,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
 
         skip_start_of_block();
         auto for_block = parse_block();
-        skip_token_allow_space("end");
+        skip_end();
         return std::make_unique<ForStmt>(tok.pos, name, std::move(expr), std::move(for_block));
     }
 
@@ -256,7 +256,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
     if (curr_tok.type == TokenType::Ensure) {
         auto tok = skip_token("ensure");
         std::unique_ptr<Expr> expr = parse_expression();
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<EnsureStmt>(tok.pos, std::move(expr));
     }
     
@@ -269,7 +269,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         auto try_block = parse_block(TokenType::Catch);
         if (curr_token().type != TokenType::Catch)
             err::error_reporter(file_path, curr_token().pos, "SyntaxError",
-            "Found try block without catch block");
+            "Try block without catch block");
 
         std::vector<std::unique_ptr<CatchStmt>> catch_blocks;
         auto block_tok = curr_token();
@@ -294,7 +294,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             err::error_reporter(file_path, curr_token().pos, "SyntaxError",
                                 "Try block not terminated with 'end'");
         }
-        skip_token_allow_space("end"); // 跳过end关键字
+        skip_end(); // 跳过end关键字
 
         // 检查catch块非空
         if (catch_blocks.empty()) {
@@ -317,21 +317,21 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         const auto name_tok = skip_token();
         skip_token("=");
         auto expr = parse_expression();
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<AssignStmt>(name_tok.pos, name_tok.text, std::move(expr));
     }
 
 
     // 解析表达式语句
     auto expr = parse_expression();
-    if (expr != nullptr and curr_token().text == "=") {
+    if (expr and curr_token().text == "=") {
         if (expr->ast_type == AstType::GetMemberExpr) {
             DEBUG_OUTPUT("parsing set member");
             skip_token("=");
             auto value = parse_expression();
 
             auto set_mem = std::make_unique<SetMemberStmt>(curr_token().pos, std::move(expr), std::move(value));
-            skip_end_of_ln();
+            skip_end_of_stmt();
             return set_mem;
         }
         if (expr->ast_type == AstType::GetItemExpr) {
@@ -340,7 +340,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             auto value = parse_expression();
 
             auto set_item = std::make_unique<SetItemStmt>(curr_token().pos, std::move(expr), std::move(value));
-            skip_end_of_ln();
+            skip_end_of_stmt();
             return set_item;
         }
         // 非成员访问表达式后不能跟 =
@@ -349,13 +349,8 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
     }
 
     if (expr) {
-        skip_end_of_ln();
+        skip_end_of_stmt();
         return std::make_unique<ExprStmt>(curr_token().pos, std::move(expr));
-    }
-
-    // 跳过换行
-    while (curr_token().type == TokenType::EndOfLine) {
-        skip_token("\n");
     }
 
     return nullptr;  // 无有效语句，返回空

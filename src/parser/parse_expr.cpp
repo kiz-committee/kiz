@@ -10,6 +10,7 @@
 
 namespace kiz {
 
+// (可能返回nullptr)
 std::unique_ptr<Expr> Parser::parse_expression() {
     DEBUG_OUTPUT("parse the expression...");
     if (curr_token().type == TokenType::TripleDot) {
@@ -131,6 +132,9 @@ std::unique_ptr<Expr> Parser::parse_unary() {
 std::unique_ptr<Expr> Parser::parse_factor() {
     DEBUG_OUTPUT("parsing factor...");
     auto node = parse_primary();
+    if (!node) {
+        err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Invalid expression");
+    }
 
     while (true) {
         if (curr_token().type == TokenType::Dot) {
@@ -166,6 +170,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
     const auto tok = skip_token();
     // 处理f-string解析
     if (tok.type == TokenType::FStringStart) {
+
         std::unique_ptr<Expr> combined_expr = nullptr;
 
         // 遍历f-string内部Token，直到FStringEnd
@@ -287,6 +292,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
                 // 处理参数间的逗号
                 if (curr_token().type == TokenType::Comma) {
                     skip_token(",");
+                    skip_end_of_lines();
                 } else if (curr_token().type != TokenType::RParen) {
                     err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Mismatched function parameters");
                 }
@@ -297,7 +303,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         // 解析函数体（无大括号，用end结尾）
         skip_start_of_block();  // 跳过参数后的换行
         auto func_body = parse_block();
-        skip_token("end");
+        skip_token("end");  // 特殊处理
         return std::make_unique<LambdaExpr>(curr_token().pos,
             "<lambda>",
             std::move(func_params),
@@ -325,9 +331,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         );
     }
     if (tok.type == TokenType::LBrace) {
-        while(curr_token().type == TokenType::EndOfLine) {
-            skip_token(); // 直接跳过换行
-        }
+        skip_end_of_lines();
 
         decltype(DictExpr::elements) init_vec{};
         while (curr_token().type != TokenType::RBrace) {
@@ -339,8 +343,10 @@ std::unique_ptr<Expr> Parser::parse_primary() {
             while(curr_token().type == TokenType::EndOfLine)
                 skip_token(); // 直接跳过换行
 
-            if (curr_token().type == TokenType::Comma) skip_token_allow_space(",");
-            else if (curr_token().type == TokenType::Semicolon) skip_token_allow_space(";");
+            if (curr_token().type == TokenType::Comma) {
+                skip_token(",");
+                skip_end_of_lines();
+            }
             else if (curr_token().type == TokenType::RBrace) {
                 init_vec.emplace_back(std::move(key), std::move(val));
                 break;
@@ -363,14 +369,19 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         skip_token(")");
         return expr;
     }
+    return nullptr;
 }
 
 std::vector<std::unique_ptr<Expr>> Parser::parse_args(const TokenType endswith){
     std::vector<std::unique_ptr<Expr>> params;
     while (curr_token().type != endswith) {
-        params.emplace_back(parse_expression());
+        auto expr = parse_expression();
+        if (! expr)
+            err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Unclosed argument list");
+        params.emplace_back(std::move(expr));
         if (curr_token().type == TokenType::Comma) {
             skip_token(",");
+            skip_end_of_lines();
         } else if (curr_token().type != endswith) {
             err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Unclosed argument list");
         }

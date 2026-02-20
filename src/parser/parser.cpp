@@ -20,13 +20,6 @@
 
 namespace kiz {
 
-Token Parser::skip_token_allow_space(const std::string& want_skip) {
-    auto tok = skip_token(want_skip);
-    while (curr_token().type == TokenType::EndOfLine)
-        skip_token("\n");
-    return tok;
-}
-
 Token Parser::skip_token(const std::string& want_skip) {
     DEBUG_OUTPUT("skipping token: index " + std::to_string(curr_tok_idx_));
 
@@ -62,17 +55,19 @@ Token Parser::curr_token() const {
     return end_of_file;
 }
 
-// skip_end_of_ln实现
-void Parser::skip_end_of_ln() {
+// skip_end_of_stmt实现
+void Parser::skip_end_of_stmt() {
     DEBUG_OUTPUT("skipping end of line...");
     const Token curr_tok = curr_token();
     // 支持分号或换行作为语句结束符
     if (curr_tok.type == TokenType::Semicolon) {
-        skip_token(";");
+        while (curr_token().type == TokenType::Semicolon) {
+            skip_token(";");
+        }
         return;
     }
     if (curr_tok.type == TokenType::EndOfLine) {
-        skip_token();
+        skip_end_of_lines();
         return;
     }
     // 到达文件末尾也视为合法结束
@@ -84,6 +79,30 @@ void Parser::skip_end_of_ln() {
     err::error_reporter(file_path, curr_tok.pos, "SyntaxError", "Invalid statement terminator");
 }
 
+// skip_end实现
+void Parser::skip_end() {
+    DEBUG_OUTPUT("skipping end of line...");
+    skip_token("end");
+    const Token curr_tok = curr_token();
+    // 支持分号或换行作为语句结束符
+    if (curr_tok.type == TokenType::Semicolon) {
+        while (curr_token().type == TokenType::Semicolon) {
+            skip_token(";");
+        }
+        return;
+    }
+    if (curr_tok.type == TokenType::EndOfLine) {
+        skip_end_of_lines();
+        return;
+    }
+    // 到达文件末尾也视为合法结束
+    if (curr_tok.type == TokenType::EndOfFile) {
+        DEBUG_OUTPUT("end of the file");
+        skip_token();
+        return;
+    }
+}
+
 // skip_start_of_block实现 处理函数体前置换行
 void Parser::skip_start_of_block() {
     DEBUG_OUTPUT("skipping start of block...");
@@ -92,9 +111,15 @@ void Parser::skip_start_of_block() {
     //     skip_token(":");
     //     return;
     // }
-    while (curr_tok.type == TokenType::EndOfLine) {
+    if (curr_tok.type == TokenType::EndOfLine) {
         skip_token("\n");
         return;
+    }
+}
+
+void Parser::skip_end_of_lines() {
+    while (curr_token().type == TokenType::EndOfLine) {
+        skip_token("\n");
     }
 }
 
@@ -123,8 +148,11 @@ std::unique_ptr<BlockStmt> Parser::parse(const std::vector<Token>& tokens) {
             skip_token(); // 直接跳过换行
         }
         if (curr_token().type == TokenType::EndOfFile) break;
-        if (auto stmt = parse_stmt()) {
+        auto stmt = parse_stmt();
+        if (stmt) {
             program_stmts.push_back(std::move(stmt));
+        } else {
+            err::error_reporter(file_path, curr_token().pos, "SyntaxError","Invalid syntax");
         }
     }
 

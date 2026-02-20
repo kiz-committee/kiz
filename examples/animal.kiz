@@ -3,6 +3,7 @@ object Animal
     fn __call__(this, n)
         o = create(this)
         o.name = n
+
         return o
     end
 

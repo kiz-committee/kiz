@@ -132,7 +132,7 @@ Object* native_function_str(Object* self, const List* args) {
      "<NativeFunction" +
          (self_nfn->name.empty()
          ? ""
-         : ": path='" + self_nfn->name + "'"
+         : ": name='" + self_nfn->name + "'"
          )
          + " at " + ptr_to_string(self_nfn) + ">"
     );
