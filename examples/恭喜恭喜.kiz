@@ -29,3 +29,19 @@ for street in streets
         assert(sentence=="恭喜恭喜")
     end
 end
+
+winter = []
+
+object SpringAndAir
+    fn response(this)
+        ...
+    end
+end
+
+while 1
+    item = winter.__next__()
+    if item == __StopIterSingal__
+        SpringAndAir.response()
+        break
+    end
+end
