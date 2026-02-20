@@ -297,7 +297,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         // 解析函数体（无大括号，用end结尾）
         skip_start_of_block();  // 跳过参数后的换行
         auto func_body = parse_block();
-        skip_token_allow_space("end");
+        skip_token("end");
         return std::make_unique<LambdaExpr>(curr_token().pos,
             "<lambda>",
             std::move(func_params),
@@ -363,7 +363,6 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         skip_token(")");
         return expr;
     }
-    err::error_reporter(file_path, tok.pos, "SyntaxError", "Invalid expression");
 }
 
 std::vector<std::unique_ptr<Expr>> Parser::parse_args(const TokenType endswith){

@@ -1,5 +1,4 @@
 fn c
-    # 使其报错
     a=0
     print(a.b)
 end
