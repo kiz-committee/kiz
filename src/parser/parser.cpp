@@ -20,6 +20,13 @@
 
 namespace kiz {
 
+Token Parser::skip_token_allow_space(const std::string& want_skip) {
+    auto tok = skip_token(want_skip);
+    while (curr_token().type == TokenType::EndOfLine)
+        skip_token("\n");
+    return tok;
+}
+
 Token Parser::skip_token(const std::string& want_skip) {
     DEBUG_OUTPUT("skipping token: index " + std::to_string(curr_tok_idx_));
 
@@ -65,7 +72,7 @@ void Parser::skip_end_of_ln() {
         return;
     }
     if (curr_tok.type == TokenType::EndOfLine) {
-        skip_token("\n");
+        skip_token();
         return;
     }
     // 到达文件末尾也视为合法结束
@@ -74,7 +81,6 @@ void Parser::skip_end_of_ln() {
         skip_token();
         return;
     }
-    DEBUG_OUTPUT("curr_tok: " + curr_tok.text);
     err::error_reporter(file_path, curr_tok.pos, "SyntaxError", "Invalid statement terminator");
 }
 

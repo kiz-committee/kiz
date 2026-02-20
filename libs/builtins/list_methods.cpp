@@ -250,8 +250,12 @@ Object* list_pop(Object* self, const List* args) {
     auto self_list = dynamic_cast<List*>(self);
     assert(self_list != nullptr);
 
+    if (self_list->val.empty()) {
+        return load_nil();
+    }
+    auto back = self_list->val.back();
     self_list->val.pop_back();
-    return load_nil();
+    return back;
 }
 
 Object* list_insert(Object* self, const List* args) {

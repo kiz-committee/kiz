@@ -532,7 +532,7 @@ inline auto copy_if_mutable(Object* obj) -> Object* {
         for (auto val : cast_to_list(obj)->val) {
             new_val.push_back(copy_if_mutable(val));
         }
-        return new List(std::move(new_val));
+        return new List(new_val);
     }
 
     case Object::ObjectType::Dictionary: {
@@ -552,6 +552,7 @@ inline auto copy_if_mutable(Object* obj) -> Object* {
     }
 
     default: {
+        obj->make_ref();
         return obj;
     }
 

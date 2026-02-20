@@ -54,6 +54,7 @@ void Vm::make_dict(size_t len) {
     for (size_t i = 0; i < elem_count; ++i) {
         auto value = simple_get_and_pop_stack_top(); // 弹出 value
         auto key = simple_get_and_pop_stack_top();   // 弹出 key
+        value = copy_if_mutable(value);
 
         // 计算哈希
         call_method(key, "__hash__", {});

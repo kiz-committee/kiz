@@ -23,7 +23,7 @@ std::unique_ptr<BlockStmt> Parser::parse_block(TokenType endswith) {
         }
 
         if (curr_tok.type == TokenType::EndOfFile) {
-            err::error_reporter(file_path, curr_token().pos, "ParsingError", "Block not terminated with 'end'");
+            err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Block not terminated with 'end'");
         }
 
         if (auto stmt = parse_stmt()) {
@@ -68,7 +68,7 @@ std::unique_ptr<IfStmt> Parser::parse_if() {
     }
 
     if (curr_token().type == TokenType::End) {
-        skip_token("end");
+        skip_token_allow_space("end");
     }
 
     return std::make_unique<IfStmt>(if_tok.pos, std::move(cond_expr), std::move(if_block), std::move(else_block));
@@ -95,7 +95,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Invalid if condition");
         skip_start_of_block();
         auto while_block = parse_block();
-        skip_token("end");
+        skip_token_allow_space("end");
         return std::make_unique<WhileStmt>(tok.pos, std::move(cond_expr), std::move(while_block));
     }
 
@@ -135,7 +135,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
         // 解析函数体（无大括号，用end结尾）
         skip_start_of_block();  // 跳过参数后的换行
         auto func_body = parse_block();
-        skip_token("end");
+        skip_token_allow_space("end");
 
         // 生成函数定义语句节点
         return std::make_unique<NamedFuncDeclStmt>(
@@ -217,15 +217,15 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
     if (curr_tok.type == TokenType::Object) {
         DEBUG_OUTPUT("parsing object");
         auto tok = skip_token("object");
-        skip_start_of_block();
         const std::string name = skip_token().text;
         std::string parent_name;
         if (curr_token().type == TokenType::Colon) {
             skip_token(":");
             parent_name = skip_token().text;
         }
+        skip_start_of_block();
         auto object_block = parse_block();
-        skip_token("end");
+        skip_token_allow_space("end");
         return std::make_unique<ObjectStmt>(tok.pos, name, parent_name, std::move(object_block));
     }
     
@@ -248,7 +248,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
 
         skip_start_of_block();
         auto for_block = parse_block();
-        skip_token("end");
+        skip_token_allow_space("end");
         return std::make_unique<ForStmt>(tok.pos, name, std::move(expr), std::move(for_block));
     }
 
@@ -294,7 +294,7 @@ std::unique_ptr<Stmt> Parser::parse_stmt() {
             err::error_reporter(file_path, curr_token().pos, "SyntaxError",
                                 "Try block not terminated with 'end'");
         }
-        skip_token("end"); // 跳过end关键字
+        skip_token_allow_space("end"); // 跳过end关键字
 
         // 检查catch块非空
         if (catch_blocks.empty()) {

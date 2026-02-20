@@ -267,7 +267,6 @@ void Vm::handle_import(const std::string& module_path) {
         const auto name = call_stack.back()->code_object->var_names[i - call_stack.back()->bp];
         if (name.starts_with("__private__")) continue;
 
-        local_object->attrs_insert("__owner_module__", module_obj);
         module_obj->attrs_insert(name, local_object);
     }
 

@@ -297,7 +297,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         // 解析函数体（无大括号，用end结尾）
         skip_start_of_block();  // 跳过参数后的换行
         auto func_body = parse_block();
-        skip_token("end");
+        skip_token_allow_space("end");
         return std::make_unique<LambdaExpr>(curr_token().pos,
             "<lambda>",
             std::move(func_params),
@@ -325,6 +325,10 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         );
     }
     if (tok.type == TokenType::LBrace) {
+        while(curr_token().type == TokenType::EndOfLine) {
+            skip_token(); // 直接跳过换行
+        }
+
         decltype(DictExpr::elements) init_vec{};
         while (curr_token().type != TokenType::RBrace) {
             DEBUG_OUTPUT("parse dict item");
@@ -332,8 +336,11 @@ std::unique_ptr<Expr> Parser::parse_primary() {
             skip_token(":");
             auto val = parse_expression();
 
-            if (curr_token().type == TokenType::Comma) skip_token(",");
-            else if (curr_token().type == TokenType::Semicolon) skip_token(";");
+            while(curr_token().type == TokenType::EndOfLine)
+                skip_token(); // 直接跳过换行
+
+            if (curr_token().type == TokenType::Comma) skip_token_allow_space(",");
+            else if (curr_token().type == TokenType::Semicolon) skip_token_allow_space(";");
             else if (curr_token().type == TokenType::RBrace) {
                 init_vec.emplace_back(std::move(key), std::move(val));
                 break;
@@ -356,9 +363,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
         skip_token(")");
         return expr;
     }
-    if (tok.type == TokenType::EndOfLine or tok.type == TokenType::EndOfFile)
-        err::error_reporter(file_path, tok.pos, "SyntaxError", "Expression ended invalid");
-    else err::error_reporter(file_path, tok.pos, "SyntaxError", "Invalid expression");
+    err::error_reporter(file_path, tok.pos, "SyntaxError", "Invalid expression");
 }
 
 std::vector<std::unique_ptr<Expr>> Parser::parse_args(const TokenType endswith){

@@ -23,6 +23,7 @@ public:
     ~Parser() = default;
 
     Token skip_token(const std::string& want_skip = "");
+    Token skip_token_allow_space(const std::string& want_skip = "");
     void skip_end_of_ln();
     void skip_start_of_block();
     [[nodiscard]] Token curr_token() const;

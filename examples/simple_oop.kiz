@@ -15,4 +15,4 @@ Dog.bark = Dog_bark
 
 my_dog = Dog("Tim")
 my_dog.bark()
-print("run time:", now()-start, "ns")
+print("using:", now()-start, "ns")
