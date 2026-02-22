@@ -318,6 +318,7 @@ std::unique_ptr<Expr> Parser::parse_primary() {
             if (curr_token().type == TokenType::Comma) skip_token(",");
         }
         skip_token("|");
+        skip_end_of_lines();
         auto expr = parse_expression();
         std::vector<std::unique_ptr<Stmt>> stmts;
         stmts.emplace_back(std::make_unique<ReturnStmt>(curr_token().pos, std::move(expr)));

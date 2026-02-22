@@ -144,9 +144,12 @@ std::unique_ptr<BlockStmt> Parser::parse(const std::vector<Token>& tokens) {
     // 全局块解析：直到 EOF
     while (curr_token().type != TokenType::EndOfFile) {
         // 跳过前置换行（仅清理，不处理语句）
-        while(curr_token().type == TokenType::EndOfLine) {
-            skip_token(); // 直接跳过换行
+        skip_end_of_lines();
+        while (curr_token().type == TokenType::TripleDot) {
+            skip_token("...");
+            skip_end_of_lines();
         }
+        skip_end_of_lines();
         if (curr_token().type == TokenType::EndOfFile) break;
         auto stmt = parse_stmt();
         if (stmt) {

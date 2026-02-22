@@ -15,19 +15,28 @@ std::unique_ptr<BlockStmt> Parser::parse_block(TokenType endswith) {
     std::vector<std::unique_ptr<Stmt>> block_stmts;
     auto block_tok = curr_token();
 
-    while (curr_tok_idx_ < tokens_.size()) {
-        const Token& curr_tok = curr_token();
+    while (curr_token().type != TokenType::EndOfFile) {
+        // 跳过前导空白
+        skip_end_of_lines();
+        while (curr_token().type == TokenType::TripleDot) {
+            skip_token("...");
+            skip_end_of_lines();
+        }
+        skip_end_of_lines();
 
-        if (curr_tok.type == endswith or curr_tok.type == TokenType::End) {
+        if (curr_token().type == endswith || curr_token().type == TokenType::End) {
             break;
         }
 
-        if (curr_tok.type == TokenType::EndOfFile) {
+        if (curr_token().type == TokenType::EndOfFile) {
             err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Block not terminated with 'end'");
         }
 
-        if (auto stmt = parse_stmt()) {
+        auto stmt = parse_stmt();
+        if (stmt) {
             block_stmts.push_back(std::move(stmt));
+        } else {
+            err::error_reporter(file_path, curr_token().pos, "SyntaxError", "Invalid syntax");
         }
     }
 
