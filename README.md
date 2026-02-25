@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://user3082.cn.imgto.link/public/20260225/segment.svg" width="160" height="220" alt="kiz logo">
+<img src="https://user3082.cn.imgto.link/public/20260225/segment.svg" width="300" height="500" alt="kiz logo">
 <h1> kiz v0.7.11 🎉</h1>
 </div>
 
